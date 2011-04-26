@@ -62,3 +62,9 @@ if has("autocmd")
  au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
  \| exe "normal! g'\"" | endif
 endif
+
+" Highlight long comments and trailing whitespace.
+highlight ExtraWhitespace ctermbg=red guibg=red
+let a = matchadd('ExtraWhitespace', '\s\+$')
+highlight OverLength ctermbg=red ctermfg=white guibg=red guifg=white
+let b = matchadd('OverLength', '\(^\(\s\)\{-}\(*\|//\|/\*\)\{1}\(.\)*\(\%81v\)\)\@<=\(.\)\{1,}$')
