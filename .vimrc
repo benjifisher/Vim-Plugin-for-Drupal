@@ -1,42 +1,45 @@
+"Enable filetype detection
 :filetype on
 
 "General settings
-set incsearch
-set ignorecase
-set scrolloff=2
-set smartcase
-set number
-set wildmode=longest,list
-set pastetoggle=<F2>
-set ffs=unix
-set smartindent
-set smarttab
-set history=300
-set showmode
-set showmatch
-set backspace=2
-set hlsearch
-set ruler
-set formatoptions=1
-set lbr
+set incsearch               "Find as you type
+set ignorecase              "Ignore case in search
+set scrolloff=2             "Number of lines to keep above/below cursor
+set smartcase               "Only ignore case when all letters are lowercase
+set number                  "Show line numbers
+set wildmode=longest,list   "Complete longest string, then list alternatives
+set pastetoggle=<F2>        "Toggle paste mode
+set fileformats=unix        "Use Unix line endings
+set smartindent             "Smart autoindenting on new line
+set smarttab                "Respect space/tab settings
+set history=300             "Number of commands to remember
+set showmode                "Show whether in Visual, Replace, or Insert Mode
+set showmatch               "Show matching brackets/parentheses
+set backspace=2             "Use standard backspace behavior
+set hlsearch                "Highlight matches in search
+set ruler                   "Show line and column number
+set formatoptions=1         "Don't wrap text after a one-letter word
+set linebreak               "Break lines when appropriate
 
 "Drupal settings
-set expandtab
-set tabstop=2
-set shiftwidth=2
-set autoindent
-let php_htmlInStrings = 1
-let php_parent_error_open = 1
+set expandtab               "Tab key inserts spaces
+set tabstop=2               "Use two spaces for tabs
+set shiftwidth=2            "Use two spaces for auto-indent
+set autoindent              "Auto indent based on previous line
+let php_htmlInStrings = 1   "Syntax highlight for HTML inside PHP strings
+let php_parent_error_open = 1 "Display error for unmatch brackets
 
+"Enable syntax highlighting
 if &t_Co > 1
   syntax enable
 endif
 
+"When in split screen, map <C-LeftArrow> and <C-RightArrow> to switch panes.
 nn [5C <C-W>w
 nn [5R <C-W>W
 
+"Set filetype for Drupal PHP files.
 if has("autocmd")
- " Drupal *.module and *.install files.
   augroup module
     autocmd BufRead,BufNewFile *.module set filetype=php
     autocmd BufRead,BufNewFile *.php set filetype=php
