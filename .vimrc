@@ -79,3 +79,5 @@ let b = matchadd('OverLength', '\(^\(\s\)\{-}\(*\|//\|/\*\)\{1}\(.\)*\(\%81v\)\)
 nnoremap <Leader>da :execute "!open http://api.drupal.org/".shellescape(expand("<cword>"), 1)<CR>
 " Lookup the API docs for a drush function under cursor.
 nnoremap <Leader>dda :execute "!open http://api.drush.ws/api/function/".shellescape(expand("<cword>"), 1)<CR>
+" Get the value of the drupal variable under cursor.
+nnoremap <Leader>dv :execute "!drush vget ".shellescape(expand("<cword>"), 1)<CR>
