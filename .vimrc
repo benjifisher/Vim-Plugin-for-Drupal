@@ -74,3 +74,8 @@ highlight ExtraWhitespace ctermbg=red guibg=red
 let a = matchadd('ExtraWhitespace', '\s\+$')
 highlight OverLength ctermbg=red ctermfg=white guibg=red guifg=white
 let b = matchadd('OverLength', '\(^\(\s\)\{-}\(*\|//\|/\*\)\{1}\(.\)*\(\%81v\)\)\@<=\(.\)\{1,}$')
+
+" Lookup the API docs for a drupal function under cursor.
+nnoremap <Leader>da :execute "!open http://api.drupal.org/".shellescape(expand("<cword>"), 1)<CR>
+" Lookup the API docs for a drush function under cursor.
+nnoremap <Leader>dda :execute "!open http://api.drush.ws/api/function/".shellescape(expand("<cword>"), 1)<CR>
