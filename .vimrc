@@ -1,6 +1,9 @@
 " Allow Vim-only settings even if they break vi keybindings.
 set nocompatible
 
+" Always edit in utf-8:
+set encoding=utf-8
+
 "Enable filetype detection
 :filetype on
 
