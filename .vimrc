@@ -81,10 +81,30 @@ if has("autocmd")
 endif
 
 " Highlight long comments and trailing whitespace.
+" Adapted from http://vim.wikia.com/wiki/Highlight_unwanted_spaces
+" TODO:  When we move thes commands to an ftplugin, see :help autocmd-buflocal
 highlight ExtraWhitespace ctermbg=red guibg=red
-let a = matchadd('ExtraWhitespace', '\s\+$')
 highlight OverLength ctermbg=red ctermfg=white guibg=red guifg=white
-let b = matchadd('OverLength', '\(^\(\s\)\{-}\(*\|//\|/\*\)\{1}\(.\)*\(\%81v\)\)\@<=\(.\)\{1,}$')
+augroup Drupal
+  " Remove ALL autocommands for the Drupal group.
+  autocmd!
+  autocmd BufWinEnter * let w:whitespace_match_number =
+	\ matchadd('ExtraWhitespace', '\s\+$')
+  autocmd BufWinEnter * call matchadd('OverLength',
+	\ '\(^\(\s\)\{-}\(*\|//\|/\*\)\{1}\(.\)*\(\%81v\)\)\@<=\(.\)\{1,}$')
+  autocmd InsertEnter * call s:ToggleWhitespaceMatch('i')
+  autocmd InsertLeave * call s:ToggleWhitespaceMatch('n')
+augroup END
+function! s:ToggleWhitespaceMatch(mode)
+  let pattern = (a:mode == 'i') ? '\s\+\%#\@<!$' : '\s\+$'
+  if exists('w:whitespace_match_number')
+    call matchdelete(w:whitespace_match_number)
+    call matchadd('ExtraWhitespace', pattern, 10, w:whitespace_match_number)
+  else
+    " Something went wrong, try to be graceful.
+    w:whitespace_match_number =  matchadd('ExtraWhitespace', pattern)
+  endif
+endfunction
 
 " Lookup the API docs for a drupal function under cursor.
 nnoremap <Leader>da :execute "!open http://api.drupal.org/".shellescape(expand("<cword>"), 1)<CR>
