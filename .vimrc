@@ -4,10 +4,10 @@ set nocompatible
 " Always edit in utf-8:
 set encoding=utf-8
 
-"Enable filetype detection
+" Enable filetype detection
 :filetype on
 
-"General settings
+" General settings
 set incsearch               "Find as you type
 set ignorecase              "Ignore case in search
 set scrolloff=2             "Number of lines to keep above/below cursor
@@ -27,7 +27,13 @@ set ruler                   "Show line and column number
 set formatoptions=1         "Don't wrap text after a one-letter word
 set linebreak               "Break lines when appropriate
 
-"Drupal settings
+" Persistent Undo (vim 7.3 and later)
+if v:version >= 703
+  set undodir=~/.vim_runtime/undodir
+  set undofile
+endif
+
+" Drupal settings
 set expandtab               "Tab key inserts spaces
 set tabstop=2               "Use two spaces for tabs
 set shiftwidth=2            "Use two spaces for auto-indent
@@ -35,16 +41,16 @@ set autoindent              "Auto indent based on previous line
 let php_htmlInStrings = 1   "Syntax highlight for HTML inside PHP strings
 let php_parent_error_open = 1 "Display error for unmatch brackets
 
-"Enable syntax highlighting
+" Enable syntax highlighting
 if &t_Co > 1
   syntax enable
 endif
 
-"When in split screen, map <C-LeftArrow> and <C-RightArrow> to switch panes.
+" When in split screen, map <C-LeftArrow> and <C-RightArrow> to switch panes.
 nn [5C <C-W>w
 nn [5R <C-W>W
 
-"Set filetype for Drupal PHP files.
+" Set filetype for Drupal PHP files.
 if has("autocmd")
   augroup module
     autocmd BufRead,BufNewFile *.module set filetype=php
@@ -59,12 +65,12 @@ if has("autocmd")
 endif
 syntax on
 
-"Custom key mapping
+" Custom key mapping
 map <S-u> :redo<cr>
 map <C-n> :tabn<cr>
 map <C-p> :tabp<cr>
 
-"Custom SVN blame
+" Custom SVN blame
 vmap gl :<C-U>!svn blame <C-R>=expand("%:P") <CR> \| sed -n <C-R>=line("'<") <CR>,<C-R>=line("'>") <CR>p <CR>
 
 " Uncomment the following to have Vim jump to the last position when
