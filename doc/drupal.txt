@@ -1,0 +1,89 @@
+*drupal.txt*	For Vim version 7.1 or later.  Last change:  2011 Oct 13
+
+			   Configuration for Drupal
+
+*drupal* *ultimate-drupal-vimrc*
+
+1. Installation						|drupal-installation|
+2. Filetype detection					|drupal-filetypes|
+3. Global settings					|drupal-global|
+4. PHP settings						|drupal-PHP|
+
+The functionality mentioned here is provided by several files.  See the
+installation section.
+
+==============================================================================
+1. Installation						*drupal-installation*
+
+Copy the files, other than README.txt, into your |vimfiles| directory.  If you
+have downloaded these files as ultimate_vimrc.tgz and your vimfiles directory
+is ~/.vim, then this should work on UNIX-like systems: >
+	$ cd ~/.vim
+	$ tar tzf path/to/ultimate_vimrc.tgz
+	$ tar xzf path/to/ultimate_vimrc.tgz \
+		--strip-components 1 --exclude=README.txt
+Note:  if there are filename conflicts, then tar will silently remove the
+existing files.
+
+When you are done, you should have the following directory structure inside
+your |vimfiles| directory: >
+	doc/drupal.txt
+	ftdetect/drupal.vim
+	ftplugin/php_drupal.vim
+	plugin/drupal.vim
+
+In order to use the tags defined in this help file, start vim and >
+	:helptags ~/.vim/doc
+(assuming that this file is installed as ~/.vim/doc/drupal.txt).  See
+|add-local-help| for details.
+
+TODO:  There should be a way to install with drush.
+
+==============================================================================
+2. Filetype detection					*drupal-filetypes*
+
+The file ftdetect/drupal.vim ensures that files with these extensions are
+recognized as PHP: >
+	.module, .php, .install, .inc, .profile, .theme, .engine, .test
+and these are recognized as INI format: >
+	.info, .make, .build
+This assumes that you have |filetype| detection on.  See also |ftdetect|.
+
+==============================================================================
+3. Global settings					*drupal-global*
+
+The file plugin/drupal.vim sets several |options|.  These will apply whether
+or not you are editing Drupal-related files.  In addition, it sets |filetype|
+detection and |ftplugin| support on; sets global variables used by the
+|php-syntax| file; defines several key mappings; and it highlights trailing
+whitespace and PHP comment lines longer than 80 characters.
+
+==============================================================================
+4. PHP settings						*drupal-PHP*
+
+The file ftplugin/php_drupal.vim sets the following options when editing PHP
+files:
+	'ignorecase', 'smartcase', 'smartindent', 'smarttab', 'expandtab',
+	'tabstop'=2, 'shiftwidth'=2, 'autoindent'
+It also defines the following mappings:
+
+gl	Custom SVN blame		*drupal-SVN-blame* *drupal-gl*
+					*drupal-API* *drupal-\da*
+\da	Lookup the API docs for a drupal function under cursor.
+					*drupal-drush-API* *drupal-\dda*
+\dda	Lookup the API docs for a drush function under cursor.
+					*drupal-variable* *drupal-\dv*
+\dv	Get the value of the drupal variable under cursor.
+
+You can define the |maplocalleader| variable to be something other than the
+default if you do not want these maps to start with a backslash.
+
+==============================================================================
+5. Updates and support			*drupal-update* *drupal-support*
+
+For the latest version of this project, see http://drupal.org/project/vimrc .
+To file a bug report or feature request, see the corresponding issues queue:
+http://drupal.org/project/issues/vimrc?status=All&categories=All
+
+==============================================================================
+ vim:tw=78:ts=8:ft=help:norl:
