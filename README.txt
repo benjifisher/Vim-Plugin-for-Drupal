@@ -8,21 +8,24 @@ Copy the files, other than this README.txt, into your vimfiles directory.  For m
 
 :help vimfiles
 
-for details.  If you have downloaded these files as ultimate_vimrc.tgz and your vimfiles directory is ~/.vim, then this should work:
+for details.  If you have downloaded these files as ultimate_vimrc.tgz and your vimfiles directory is ~/.vim, then this should work on UNIX-like systems:
 
 $ cd ~/.vim
-$ tar xzf ~/src/ultimate_vimrc.tgz --strip-components 1
-$ rm README.txt
+$ tar xzf path/to/ultimate_vimrc.tgz --strip-components 1 --exclude=README.txt
 
 When you are done, you should have the following directory structure inside your vimfiles directory:
 
-	doc/
-	ftdetect/
+	doc/drupal.txt
 	ftdetect/drupal.vim
-	ftplugin/
 	ftplugin/php_drupal.vim
-	plugin/
 	plugin/drupal.vim
+
+In order to use the tags defined in the help file, start vim and do
+	:helptags ~/.vim/doc
+(assuming that the file is installed as ~/.vim/doc/drupal.txt).  See
+	:help add-local-help
+for details.  After this step, you should be able to read the documentation with
+	:help drupal.txt
 
 UPDATES AND SUPPORT
 
