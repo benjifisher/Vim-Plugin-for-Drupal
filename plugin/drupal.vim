@@ -56,27 +56,40 @@ if has("autocmd")
 endif
 
 " Highlight long comments and trailing whitespace.
+" It is not good practice to include syntax items in a plugin file, but we do
+" it here, with Syntax autocommands, because syntax files do not follow the
+" same naming conventions as ftplugin files, so we cannot use (for example)
+" syntax/php_drupal.vim .
 " Adapted from http://vim.wikia.com/wiki/Highlight_unwanted_spaces
-" TODO:  When we move thes commands to an ftplugin, see :help autocmd-buflocal
-highlight ExtraWhitespace ctermbg=red guibg=red
-highlight OverLength ctermbg=red ctermfg=white guibg=red guifg=white
+highlight default link drupalExtraWhitespace Error
+highlight default link drupalOverLength Error
 augroup Drupal
   " Remove ALL autocommands for the Drupal group.
   autocmd!
-  autocmd BufWinEnter * let w:whitespace_match_number =
-	\ matchadd('ExtraWhitespace', '\s\+$')
-  autocmd BufWinEnter * call matchadd('OverLength',
-	\ '\(^\(\s\)\{-}\(*\|//\|/\*\)\{1}\(.\)*\(\%81v\)\)\@<=\(.\)\{1,}$')
-  autocmd InsertEnter * call s:ToggleWhitespaceMatch('i')
-  autocmd InsertLeave * call s:ToggleWhitespaceMatch('n')
+  autocmd Syntax php syn match drupalOverLength "\%81v.*" containedin=phpComment contained
+  autocmd Syntax css syn match drupalOverLength "\%81v.*" containedin=cssComment contained
+  autocmd BufWinEnter * call s:ToggleWhitespaceMatch('BufWinEnter')
+  autocmd BufWinLeave * call s:ToggleWhitespaceMatch('BufWinLeave')
+  autocmd InsertEnter * call s:ToggleWhitespaceMatch('InsertEnter')
+  autocmd InsertLeave * call s:ToggleWhitespaceMatch('InsertLeave')
 augroup END
-function! s:ToggleWhitespaceMatch(mode)
-  let pattern = (a:mode == 'i') ? '\s\+\%#\@<!$' : '\s\+$'
-  if exists('w:whitespace_match_number')
-    call matchdelete(w:whitespace_match_number)
-    call matchadd('ExtraWhitespace', pattern, 10, w:whitespace_match_number)
-  else
-    " Something went wrong, try to be graceful.
-    w:whitespace_match_number =  matchadd('ExtraWhitespace', pattern)
+function! s:ToggleWhitespaceMatch(event)
+  if &ft != 'php' && &ft != 'css'
+    return
+  endif
+  if a:event == 'BufWinEnter'
+    let w:whitespace_match_number = matchadd('drupalExtraWhitespace', '\s\+$')
+    return
+  endif
+  if !exists('w:whitespace_match_number')
+    return
+  endif
+  call matchdelete(w:whitespace_match_number)
+  if a:event == 'BufWinLeave'
+    unlet w:whitespace_match_number
+  elseif a:event == 'InsertEnter'
+    call matchadd('drupalExtraWhitespace', '\s\+\%#\@<!$', 10, w:whitespace_match_number)
+  elseif a:event == 'InsertLeave'
+    call matchadd('drupalExtraWhitespace', '\s\+$', 10, w:whitespace_match_number)
   endif
 endfunction
