@@ -64,7 +64,14 @@ whitespace and PHP comment lines longer than 80 characters.
 The file ftplugin/php_drupal.vim sets the following options when editing PHP
 files:
 	'ignorecase', 'smartcase', 'smartindent', 'smarttab', 'expandtab',
-	'tabstop'=2, 'shiftwidth'=2, 'autoindent'
+	'tabstop'=2, 'shiftwidth'=2, 'autoindent', 'comments', 'textwidth',
+	'formatoptions'
+Comments (both doc blocks and //-style) will automatically break at 80
+characters, and can be reformatted with |gq|.  You can start a doc block with
+"/**<CR>" and the indentation and comment leader will be inserted.  To end the
+block, just type "<CR>/" and the inserted "* " will automatically turn into
+"*/".  To delete the automatically inserted "// ", you can use <C-U>.
+
 It also defines the following mappings:
 
 gl	Custom SVN blame		*drupal-SVN-blame* *drupal-gl*
