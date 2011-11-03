@@ -1,5 +1,5 @@
-" This file contains common Drupal-related settings.  It is :source'd by the
-" *_drupal.vim files in this directory; there is no drupal filetype.
+" We never :set ft=drupal.  This filetype is always added to another, as in
+" :set ft=php.drupal or :set ft=css.drupal.
 
 setl nojoinspaces            "No second space when joining lines that end in "."
 setl autoindent              "Auto indent based on previous line
@@ -27,3 +27,16 @@ nnoremap <buffer> <LocalLeader>da :execute "!open http://api.drupal.org/".shelle
 nnoremap <buffer> <LocalLeader>dda :execute "!open http://api.drush.ws/api/function/".shellescape(expand("<cword>"), 1)<CR>
 " Get the value of the drupal variable under cursor.
 nnoremap <buffer> <LocalLeader>dv :execute "!drush vget ".shellescape(expand("<cword>"), 1)<CR>
+
+" PHP specific settings.
+" In ftdetect/drupal.vim we set ft=php.drupal.  This means that the settings
+" here will come after those set by the PHP ftplugins.  In particular, we can
+" override the 'comments' setting.
+
+if &ft =~ '\<php\>'
+  setl ignorecase              "Ignore case in search
+  setl smartcase               "Only ignore case when all letters are lowercase
+  setl comments=sr:/**,m:*\ ,ex:*/,://
+  "  Format comment blocks.  Just type / on a new line to close.
+  "  Recognize // (but not #) style comments.
+endif
