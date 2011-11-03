@@ -8,5 +8,4 @@ syn match drupalOverLength "\%81v.*" containedin=@drupalComment contained
 execute 'syn cluster drupalComment contains=' . 
       \ join(map(split(&syntax, '\.'), 'v:val."Comment"'), ',')
 
-highlight default link drupalExtraWhitespace Error
 highlight default link drupalOverLength Error
