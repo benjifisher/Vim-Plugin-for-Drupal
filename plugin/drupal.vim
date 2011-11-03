@@ -69,6 +69,7 @@ augroup Drupal
   autocmd InsertEnter * call s:ToggleWhitespaceMatch('InsertEnter')
   autocmd InsertLeave * call s:ToggleWhitespaceMatch('InsertLeave')
 augroup END
+highlight default link drupalExtraWhitespace Error
 
 " Adapted from http://vim.wikia.com/wiki/Highlight_unwanted_spaces
 function! s:ToggleWhitespaceMatch(event)
