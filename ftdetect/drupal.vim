@@ -8,4 +8,4 @@ autocmd BufRead,BufNewFile *.theme set filetype=php
 autocmd BufRead,BufNewFile *.engine set filetype=php
 autocmd BufRead,BufNewFile *.test set filetype=php
 " info and make files use INI syntax.
-autocmd BufRead,BufNewFile *.{info,make,build}	set filetype=dosini
+autocmd BufRead,BufNewFile *.{info,make,build}	set filetype=drini
