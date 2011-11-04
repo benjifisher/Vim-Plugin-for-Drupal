@@ -1,20 +1,19 @@
 " Vim syntax file
 " Language:	Configuration File (ini file) for Drupal, Drush
 " Author:	Benji Fisher <http://drupal.org/user/683300>
-" Based On:	dosini.vim by Sean M. McKee
 " Last Change:	Fri Nov 04 01:00 PM 2011 EDT
 
 " TODO:  strict checking for the name, description, core, dependencies lines.
 " Note that dependencies can specify version (in)equalities.
 " References:
 " - modules (7.x):  http://drupal.org/node/542202
-"   modules (6.x):  http://drupal.org/node/231036
-"   themes (6.x, 7.x):  http://drupal.org/node/171205
-"   format (7.x):
+" - modules (6.x):  http://drupal.org/node/231036
+" - themes (6.x, 7.x):  http://drupal.org/node/171205
+" - format (7.x):
 "   http://api.drupal.org/api/drupal/includes--common.inc/function/drupal_parse_info_format/7
-"   format (6.x):
+" - format (6.x):
 "   http://api.drupal.org/api/drupal/includes--common.inc/function/drupal_parse_info_file/6
-"   Profiler:
+" - Profiler:
 "   http://drupalcode.org/project/profiler_example.git/blob_plain/HEAD:/profiler_example.info
 
 " For version 5.x: Clear all syntax items
