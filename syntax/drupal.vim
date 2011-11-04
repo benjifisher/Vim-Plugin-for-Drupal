@@ -6,6 +6,6 @@ syn match drupalOverLength "\%81v.*" containedin=@drupalComment contained
 " Add <syntax>Comment to the @drupalComment cluster for all applicable syntax
 " types.
 execute 'syn cluster drupalComment contains=' . 
-      \ join(map(split(&syntax, '\.'), 'v:val."Comment"'), ',')
+      \ substitute(&syntax, '\.\|$', 'Comment,', 'g')
 
 highlight default link drupalOverLength Error
