@@ -5,26 +5,26 @@ let php_parent_error_open = 1 "Display error for unmatch brackets
 let PHP_autoformatcomment = 0
 let PHP_removeCRwhenUnix = 1
 
-" Highlight long comments and trailing whitespace.
-" It is not good practice to include syntax items in a plugin file, but we do
-" it here, with Syntax autocommands, because syntax files do not follow the
-" same naming conventions as ftplugin files, so we cannot use (for example)
-" syntax/php_drupal.vim .
-" Adapted from http://vim.wikia.com/wiki/Highlight_unwanted_spaces
-highlight default link drupalExtraWhitespace Error
-highlight default link drupalOverLength Error
+if has("autocmd")
 augroup Drupal
   " Remove ALL autocommands for the Drupal group.
   autocmd!
-  autocmd Syntax php syn match drupalOverLength "\%81v.*" containedin=phpComment contained
-  autocmd Syntax css syn match drupalOverLength "\%81v.*" containedin=cssComment contained
+  " Add drupal as a secondary filetype.  This will load the ftplugins and syntax
+  " files drupal.vim after the usual ones.
+  autocmd FileType php,css,javascript,dosini set ft+=.drupal
+
+  " Highlight trailing whitespace.
   autocmd BufWinEnter * call s:ToggleWhitespaceMatch('BufWinEnter')
   autocmd BufWinLeave * call s:ToggleWhitespaceMatch('BufWinLeave')
   autocmd InsertEnter * call s:ToggleWhitespaceMatch('InsertEnter')
   autocmd InsertLeave * call s:ToggleWhitespaceMatch('InsertLeave')
 augroup END
+highlight default link drupalExtraWhitespace Error
+
+" Adapted from http://vim.wikia.com/wiki/Highlight_unwanted_spaces
 function! s:ToggleWhitespaceMatch(event)
-  if &ft != 'php' && &ft != 'css'
+  " Bail out unless the filetype is php.drupal, css.drupal, ...
+  if &ft !~ '\<drupal\>'
     return
   endif
   if a:event == 'BufWinEnter'
@@ -43,3 +43,4 @@ function! s:ToggleWhitespaceMatch(event)
     call matchadd('drupalExtraWhitespace', '\s\+$', 10, w:whitespace_match_number)
   endif
 endfunction
+endif " has("autocmd")
