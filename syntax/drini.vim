@@ -2,7 +2,7 @@
 " Language:	Configuration File (ini file) for Drupal, Drush
 " Author:	Benji Fisher <http://drupal.org/user/683300>
 " Based On:	dosini.vim by Sean M. McKee
-" Last Change:	Tue Nov 01 11:00 AM 2011 EDT
+" Last Change:	Fri Nov 04 01:00 PM 2011 EDT
 
 " TODO:  strict checking for the name, description, core, dependencies lines.
 " Note that dependencies can specify version (in)equalities.
@@ -62,9 +62,9 @@ function! s:IniType()
   endif
 endfun
 
-" It all begins at the start of a line.
-syn match  driniStart      contains=@driniRequired,driniPackage,@driniOptional
-      \ /^\s*\l\+/
+" Unless there is a more specific match, the entire line will be given Normal
+" highlighting.
+syn match    driniNormal "\S.*"
 " The following clusters contain all the legal keywords.  They each declare
 " nextgroup=driniEquals or nextgroup=driniIndex or a more specific variant.
 syn cluster  driniRequired contains=driniName,driniDescr,driniCore
@@ -73,11 +73,11 @@ syn cluster  driniScalar   contains=driniProfiler
 syn cluster  driniArray    contains=driniDep,driniProfilerArray
 
 " Keywords common to all file types.
-syn keyword  driniName		contained nextgroup=driniEquals skipwhite skipempty name
-syn keyword  driniDescr		contained nextgroup=driniEquals skipwhite skipempty description
-syn keyword  driniCore		contained nextgroup=driniCoreEquals skipwhite skipempty core
-syn keyword  driniDep		contained nextgroup=driniDepIndex skipwhite skipempty dependencies
-syn keyword  driniPackage	contained nextgroup=driniEquals skipwhite skipempty datestamp project version
+syn keyword  driniName		nextgroup=driniEquals skipwhite skipempty name
+syn keyword  driniDescr		nextgroup=driniEquals skipwhite skipempty description
+syn keyword  driniCore		nextgroup=driniCoreEquals skipwhite skipempty core
+syn keyword  driniDep		nextgroup=driniDepIndex skipwhite skipempty dependencies
+syn keyword  driniPackage	nextgroup=driniEquals skipwhite skipempty datestamp project version
 
 " Keywords for the Profiler module.
 syn match    driniProfiler	nextgroup=driniEquals skipwhite skipempty /\<base\>/
@@ -98,14 +98,14 @@ syn match  driniDepEquals	contained skipwhite skipempty
 syn cluster  driniValue    	contains=driniString,driniRHS
 syn match  driniCoreValue	contained /\(['"]\)\=\d\+\.x\1/
 syn match  driniDepValue	contained skipwhite skipempty
-      \ nextgroup=driniDepVersion /[a-z_.]\+/
+      \ nextgroup=driniDepVersion,driniNormal /[a-z_.]\+/
 syn region driniDepVersion	contained oneline contains=driniDepVerNo
-      \ matchgroup=driniDepParen start=/(/ end=/)/
+      \ skipwhite nextgroup=driniNormal matchgroup=driniDepParen start=/(/ end=/)/
 syn match  driniDepVerNo	contained
       \ /\(\([=><!]\?=\|[=><]\)\s*\)\=\d\+\.\(x\|\d\+\)/
 syn region driniDepString	contained oneline contains=driniDepValue,driniDepVersion
-      \ start=/\z(["']\)/ skip=/\\\z1/ end=/\z1/
-syn region driniString		contained start=/\z(["']\)/ skip=/\\\z1/ end=/\z1/
+      \ skipwhite nextgroup=driniNormal start=/\z(["']\)/ skip=/\\\z1/ end=/\z1/
+syn region driniString		contained skipwhite nextgroup=driniNormal start=/\z(["']\)/ skip=/\\\z1/ end=/\z1/
 syn match  driniRHS		contained /[^\t "';].*/
 
 let s:initype = s:IniType()
@@ -142,7 +142,7 @@ elseif s:initype == 'make' || s:initype == ''
   syn keyword  driniMakeArray	nextgroup=driniIndex skipwhite skipempty includes libraries projects
 endif
 
-syn match  driniComment		/^;.*$/ contains=driniStart
+syn match  driniComment		/^;.*$/
 syn match  driniOverLength	/\%81v.*/ containedin=driniComment contained
 
 " Define the default highlighting.  The 'default' keyword requires vim 5.8+.
@@ -163,6 +163,7 @@ highlight default link  driniProfilerArray	driniArray
 highlight default link  driniScalar	driniOptional
 highlight default link  driniArray	driniOptional
 
+highlight default link  driniNormal	Normal
 highlight default link  driniRequired	Keyword
 highlight default link  driniPackage	Keyword
 highlight default link  driniOptional	Keyword
