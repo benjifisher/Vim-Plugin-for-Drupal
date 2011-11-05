@@ -97,7 +97,8 @@ syn match  driniDepValue	contained skipwhite skipempty
       \ nextgroup=driniDepVersion,driniNormal /[a-z_.]\+/
 " The description should start with an uppercase letter, end with a period,
 " and be no more than 255 characters in total.
-syn match  driniDescValue	contained /\u\_.\{,253}\./
+syn match  driniDescValue	contained /\u.\{,253}\./
+syn match  driniDescLong	contained /\u\_.\{,253}\./
 " The name should start with an uppercase letter and the rest should be
 " lowercase letters and spaces.
 syn match  driniNameValue	contained nextgroup=driniNormal /\u[a-z ]*/
@@ -107,7 +108,7 @@ syn match  driniDepVerNo	contained
       \ /\(\([=><!]\?=\|[=><]\)\s*\)\=\d\+\.\(x\|\d\+\)/
 syn region driniDepString	contained oneline contains=driniDepValue,driniDepVersion
       \ skipwhite nextgroup=driniNormal start=/\z(["']\)/ skip=/\\\z1/ end=/\z1/
-syn region driniDescString	contained contains=driniDescValue keepend
+syn region driniDescString	contained contains=driniDescLong keepend
       \ skipwhite nextgroup=driniNormal start=/\z(["']\)/ skip=/\\\z1/ end=/\z1/
 syn region driniNameString	contained oneline contains=driniNameValue
       \ skipwhite nextgroup=driniNormal start=/\z(["']\)/ skip=/\\\z1/ end=/\z1/
@@ -172,6 +173,7 @@ highlight default link  driniNameEquals	driniEquals
 highlight default link  driniEquals	Operator
 highlight default link  driniCoreValue	driniRHS
 highlight default link  driniDepValue	driniRHS
+highlight default link  driniDescLong	driniRHS
 highlight default link  driniDescValue	driniRHS
 highlight default link  driniNameValue	driniRHS
 highlight default link  driniDepVersion	Normal
