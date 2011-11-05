@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:	Configuration File (ini file) for Drupal, Drush
 " Author:	Benji Fisher <http://drupal.org/user/683300>
-" Last Change:	Fri Nov 04 01:00 PM 2011 EDT
+" Last Change:	Sat Nov 05 11:00 AM 2011 EDT
 
 " TODO:  strict checking for the name, description, core, dependencies lines.
 " Note that dependencies can specify version (in)equalities.
@@ -17,7 +17,7 @@
 "   http://drupalcode.org/project/profiler_example.git/blob_plain/HEAD:/profiler_example.info
 
 " For version 5.x: Clear all syntax items
-" For version 6.x: Quit when a syntax file was already loaded
+" For version 6.x or higher: Quit when a syntax file was already loaded
 if version < 600
   syntax clear
 elseif exists("b:current_syntax")
@@ -64,24 +64,21 @@ endfun
 " Unless there is a more specific match, the entire line will be given Normal
 " highlighting.
 syn match    driniNormal "\S.*"
-" The following clusters contain all the legal keywords.  They each declare
-" nextgroup=driniEquals or nextgroup=driniIndex or a more specific variant.
-syn cluster  driniRequired contains=driniName,driniDescr,driniCore
-syn cluster  driniOptional contains=@driniScalar,@driniArray
-syn cluster  driniScalar   contains=driniProfiler
-syn cluster  driniArray    contains=driniDep,driniProfilerArray
+
+" Each keyword declares nextgroup=driniEquals or nextgroup=driniIndex or
+" a more specific variant.
 
 " Keywords common to all file types.
-syn keyword  driniName		nextgroup=driniEquals skipwhite skipempty name
-syn keyword  driniDescr		nextgroup=driniEquals skipwhite skipempty description
-syn keyword  driniCore		nextgroup=driniCoreEquals skipwhite skipempty core
-syn keyword  driniDep		nextgroup=driniDepIndex skipwhite skipempty dependencies
+syn keyword  driniRequired	nextgroup=driniEquals skipwhite skipempty name
+syn keyword  driniRequired	nextgroup=driniEquals skipwhite skipempty description
+syn keyword  driniRequired	nextgroup=driniCoreEquals skipwhite skipempty core
+syn keyword  driniArray		nextgroup=driniDepIndex skipwhite skipempty dependencies
 syn keyword  driniPackage	nextgroup=driniEquals skipwhite skipempty datestamp project version
 
 " Keywords for the Profiler module.
-syn match    driniProfiler	nextgroup=driniEquals skipwhite skipempty /\<base\>/
-syn keyword  driniProfilerArray	nextgroup=driniIndex skipwhite skipempty nodes terms users variables
-syn match    driniProfilerArray	nextgroup=driniIndex skipwhite skipempty /\<theme\>/
+syn match    driniScalar	nextgroup=driniEquals skipwhite skipempty /\<base\>/
+syn keyword  driniArray	nextgroup=driniIndex skipwhite skipempty nodes terms users variables
+syn match    driniArray	nextgroup=driniIndex skipwhite skipempty /\<theme\>/
 
 " After the keyword, need =, [], or [subkey].
 syn region driniIndex		contained oneline skipwhite skipempty
@@ -110,35 +107,30 @@ syn match  driniRHS		contained /[^\t "';].*/
 let s:initype = s:IniType()
 
 if s:initype == 'module' || s:initype == ''
-  syn cluster  driniScalar   add=driniModule
-  syn cluster  driniArray    add=driniModuleArray
   if !s:core || s:core >= 6
-    syn keyword  driniModule	nextgroup=driniEquals skipwhite skipempty hidden package php
+    syn keyword  driniScalar	nextgroup=driniEquals skipwhite skipempty hidden package php
   endif
 
   if !s:core || s:core >= 7
-    syn keyword  driniModule	nextgroup=driniEquals skipwhite skipempty configure required
-    syn keyword  driniModuleArray	nextgroup=driniIndex skipwhite skipempty files scripts stylesheets
+    syn keyword  driniScalar	nextgroup=driniEquals skipwhite skipempty configure required
+    syn keyword  driniArray	nextgroup=driniIndex skipwhite skipempty files scripts stylesheets
   endif
 
 elseif s:initype == 'theme' || s:initype == ''
-  syn cluster  driniScalar   add=driniTheme
-  syn cluster  driniArray    add=driniThemeArray
-  syn keyword  driniTheme    nextgroup=driniEquals skipwhite skipempty engine php screenshot
+  " Remove the dependencies keyword.
+  syn clear  driniArray
+  syn keyword  driniScalar    nextgroup=driniEquals skipwhite skipempty engine php screenshot
   " Keywords cannot contain spaces.  Make "base" and "theme" matches, too, or
   " 'base theme' will not work.  There is conflicting documentation ...
-  syn match    driniTheme	nextgroup=driniEquals skipwhite skipempty /\<base theme\>/
-  syn keyword  driniThemeArray	nextgroup=driniIndex skipwhite skipempty features regions scripts stylesheets
-  syn clear  driniDep
+  syn match    driniScalar	nextgroup=driniEquals skipwhite skipempty /\<base theme\>/
+  syn keyword  driniArray	nextgroup=driniIndex skipwhite skipempty features regions scripts stylesheets
   if !s:core || s:core >= 7
-    syn keyword  driniTheme	nextgroup=driniEquals skipwhite skipempty hidden required
+    syn keyword  driniScalar	nextgroup=driniEquals skipwhite skipempty hidden required
   endif
 
 elseif s:initype == 'make' || s:initype == ''
-  syn cluster  driniScalar   	add=driniMake
-  syn cluster  driniArray    	add=driniMakeArray
-  syn keyword  driniMake	nextgroup=driniEquals skipwhite skipempty api
-  syn keyword  driniMakeArray	nextgroup=driniIndex skipwhite skipempty includes libraries projects
+  syn keyword  driniScalar	nextgroup=driniEquals skipwhite skipempty api
+  syn keyword  driniArray	nextgroup=driniIndex skipwhite skipempty includes libraries projects
 endif
 
 syn match  driniComment		/^;.*$/
@@ -147,25 +139,14 @@ syn match  driniOverLength	/\%81v.*/ containedin=driniComment contained
 " Define the default highlighting.  The 'default' keyword requires vim 5.8+.
 
 " Link all groups to the cluster that contains them.
-highlight default link  driniName	driniRequired
-highlight default link  driniDescr	driniRequired
-highlight default link  driniCore	driniRequired
-highlight default link  driniModule	driniScalar
-highlight default link  driniTheme	driniScalar
-highlight default link  driniMake	driniScalar
-highlight default link  driniProfiler	driniScalar
-highlight default link  driniModuleArray	driniArray
-highlight default link  driniDep		driniArray
-highlight default link  driniThemeArray		driniArray
-highlight default link  driniMakeArray		driniArray
-highlight default link  driniProfilerArray	driniArray
-highlight default link  driniScalar	driniOptional
-highlight default link  driniArray	driniOptional
-
 highlight default link  driniNormal	Normal
-highlight default link  driniRequired	Keyword
-highlight default link  driniPackage	Keyword
-highlight default link  driniOptional	Keyword
+
+highlight default link  driniScalar	driniKeyword
+highlight default link  driniArray	driniKeyword
+highlight default link  driniRequired	driniKeyword
+highlight default link  driniPackage	driniKeyword
+highlight default link  driniKeyword	Keyword
+
 highlight default link  driniDepBracket	driniBracket
 highlight default link  driniBracket	Operator
 highlight default link  driniDepIndex	driniIndex
