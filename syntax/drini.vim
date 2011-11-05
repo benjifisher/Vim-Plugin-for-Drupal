@@ -1,10 +1,8 @@
 " Vim syntax file
 " Language:	Configuration File (ini file) for Drupal, Drush
 " Author:	Benji Fisher <http://drupal.org/user/683300>
-" Last Change:	Sat Nov 05 02:00 PM 2011 EDT
+" Last Change:	Sat Nov 05 03:00 PM 2011 EDT
 
-" TODO:  strict checking for the name, description, core, dependencies lines.
-" Note that dependencies can specify version (in)equalities.
 " References:
 " - modules (7.x):  http://drupal.org/node/542202
 " - modules (6.x):  http://drupal.org/node/231036
@@ -26,40 +24,42 @@ elseif exists("b:current_syntax")
 endif
 
 syn case match
-syn clear	" TODO:  remove this line.
 
-" Find the Drupal core version.
-let s:save_cursor = getpos(".")
-call cursor(1, 1)
-let s:core_re = '^\s*core\s*=\s*\zs\d\+\ze\.x\s*$'
-let s:core_line = search(s:core_re, 'cn', 500)
-let s:core = matchstr(getline(s:core_line), s:core_re)
-call setpos('.', s:save_cursor)
-
+" What is the core version?
 " Is this a theme, a module, or a Drush make file?
 " TODO:  How do we recognize a Profiler ini file?  For now, Profiler includes
 " all syntax items, which may be the right thing to do anyway.
 function! s:IniType()
+  " Find the Drupal core version.
+  let save_cursor = getpos(".")
+  call cursor(1, 1)
+  let core_re = '^\s*core\s*=\s*\zs\d\+\ze\.x\s*$'
+  let core_line = search(core_re, 'cn', 500)
+  let core = matchstr(getline(core_line), core_re)
+  call setpos('.', save_cursor)
+
   let ext = expand('%:e')
   if ext == 'make' || ext == 'build'
-    return 'make'
-  endif
-  " If the extension is not 'info' at this point, I do not know how we got
-  " here.
-  let path = expand('%:p')
-  let m_index = strridx(path, '/modules/')
-  let t_index = strridx(path, '/themes/')
-  if m_index == -1 && t_index == -1
+    let type = 'make'
+  else
+    " If the extension is not 'info' at this point, I do not know how we got
+    " here.
+    let path = expand('%:p')
     let m_index = strridx(path, '/modules/')
     let t_index = strridx(path, '/themes/')
+    if m_index == -1 && t_index == -1
+      let m_index = strridx(path, '/modules/')
+      let t_index = strridx(path, '/themes/')
+    endif
+    if m_index > t_index
+      let type = 'module'
+    elseif m_index < t_index
+      let type = 'theme'
+    else	" We are not inside a themes/ directory, nor a mudules/ directory.  Do not guess.
+      let type = ''
+    endif
   endif
-  if m_index > t_index
-    return 'module'
-  elseif m_index < t_index
-    return 'theme'
-  else	" We are not inside a themes/ directory, nor a mudules/ directory.  Do not guess.
-    return ''
-  endif
+  return [core, type]
 endfun
 
 " Unless there is a more specific match, the entire line will be given Normal
@@ -115,7 +115,7 @@ syn region driniString		contained skipwhite nextgroup=driniNormal
       \ start=/\z(["']\)/ skip=/\\\z1/ end=/\z1/
 syn match  driniRHS		contained /[^\t "';].*/
 
-let s:initype = s:IniType()
+let [s:core, s:initype] = s:IniType()
 
 if s:initype == 'module' || s:initype == ''
   if !s:core || s:core >= 6
