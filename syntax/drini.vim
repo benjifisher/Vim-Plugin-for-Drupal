@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:	Configuration File (ini file) for Drupal, Drush
 " Author:	Benji Fisher <http://drupal.org/user/683300>
-" Last Change:	Sat Nov 05 01:00 PM 2011 EDT
+" Last Change:	Sat Nov 05 02:00 PM 2011 EDT
 
 " TODO:  strict checking for the name, description, core, dependencies lines.
 " Note that dependencies can specify version (in)equalities.
@@ -70,11 +70,11 @@ syn match    driniNormal "\S.*"
 " a more specific variant.
 
 " Keywords common to all file types.
-syn keyword  driniRequired	nextgroup=driniEquals skipwhite skipempty name
-syn keyword  driniRequired	nextgroup=driniEquals skipwhite skipempty description
-syn keyword  driniRequired	nextgroup=driniCoreEquals skipwhite skipempty core
-syn keyword  driniArray		nextgroup=driniDepIndex skipwhite skipempty dependencies
-syn keyword  driniPackage	nextgroup=driniEquals skipwhite skipempty datestamp project version
+syn keyword  driniKey	nextgroup=driniEquals skipwhite skipempty name
+syn keyword  driniKey	nextgroup=driniEquals skipwhite skipempty description
+syn keyword  driniKey	nextgroup=driniCoreEquals skipwhite skipempty core
+syn keyword  driniKey	nextgroup=driniDepIndex skipwhite skipempty dependencies
+syn keyword  driniKey	nextgroup=driniEquals skipwhite skipempty datestamp project version
 
 " After the keyword, need =, [], or [subkey].
 syn region driniIndex		contained oneline skipwhite skipempty
@@ -104,38 +104,36 @@ let s:initype = s:IniType()
 
 if s:initype == 'module' || s:initype == ''
   if !s:core || s:core >= 6
-    syn keyword  driniScalar	nextgroup=driniEquals skipwhite skipempty hidden package php
+    syn keyword  driniKey	nextgroup=driniEquals skipwhite skipempty hidden package php
   endif
 
   if !s:core || s:core >= 7
-    syn keyword  driniScalar	nextgroup=driniEquals skipwhite skipempty configure required
-    syn keyword  driniArray	nextgroup=driniIndex skipwhite skipempty files scripts stylesheets
+    syn keyword  driniKey	nextgroup=driniEquals skipwhite skipempty configure required
+    syn keyword  driniKey	nextgroup=driniIndex skipwhite skipempty files scripts stylesheets
   endif
 endif
 
 if s:initype == 'theme' || s:initype == ''
-  " Remove the dependencies keyword.
-  syn clear  driniArray
-  syn keyword  driniScalar    nextgroup=driniEquals skipwhite skipempty engine package php screenshot
+  syn keyword  driniKey   nextgroup=driniEquals skipwhite skipempty engine package php screenshot
   " The keyword "base" should be followed by "theme".
-  syn keyword  driniScalar    nextgroup=driniTheme skipwhite skipempty base
+  syn keyword  driniKey   nextgroup=driniTheme skipwhite skipempty base
   syn keyword  driniTheme     contained nextgroup=driniEquals skipwhite skipempty theme
-  syn keyword  driniArray	nextgroup=driniIndex skipwhite skipempty features regions scripts settings stylesheets
+  syn keyword  driniKey   nextgroup=driniIndex skipwhite skipempty features regions scripts settings stylesheets
   if !s:core || s:core >= 7
-    syn keyword  driniScalar	nextgroup=driniEquals skipwhite skipempty hidden required
-    syn keyword  driniArray	nextgroup=driniIndex skipwhite skipempty regions_hidden
+    syn keyword  driniKey	nextgroup=driniEquals skipwhite skipempty hidden required
+    syn keyword  driniKey	nextgroup=driniIndex skipwhite skipempty regions_hidden
   endif
 endif
 
 if s:initype == 'make' || s:initype == ''
-  syn keyword  driniScalar	nextgroup=driniEquals skipwhite skipempty api
-  syn keyword  driniArray	nextgroup=driniIndex skipwhite skipempty includes libraries projects
+  syn keyword  driniKey	nextgroup=driniEquals skipwhite skipempty api
+  syn keyword  driniKey	nextgroup=driniIndex skipwhite skipempty includes libraries projects
 endif
 
 if s:initype == ''
   " Keywords for the Profiler module.
-  syn keyword  driniScalar	nextgroup=driniEquals skipwhite skipempty base
-  syn keyword  driniArray	nextgroup=driniIndex skipwhite skipempty nodes terms users variables theme
+  syn keyword  driniKey	nextgroup=driniEquals skipwhite skipempty base
+  syn keyword  driniKey	nextgroup=driniIndex skipwhite skipempty nodes terms users variables theme
 endif
 
 syn match  driniComment		/^;.*$/
@@ -146,12 +144,8 @@ syn match  driniOverLength	/\%81v.*/ containedin=driniComment contained
 " Link all groups to the cluster that contains them.
 highlight default link  driniNormal	Normal
 
-highlight default link  driniTheme	driniScalar
-highlight default link  driniScalar	driniKeyword
-highlight default link  driniArray	driniKeyword
-highlight default link  driniRequired	driniKeyword
-highlight default link  driniPackage	driniKeyword
-highlight default link  driniKeyword	Keyword
+highlight default link  driniTheme	driniKey
+highlight default link  driniKey	Keyword
 
 highlight default link  driniDepBracket	driniBracket
 highlight default link  driniBracket	Operator
