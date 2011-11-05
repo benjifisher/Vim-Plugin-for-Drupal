@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:	Configuration File (ini file) for Drupal, Drush
 " Author:	Benji Fisher <http://drupal.org/user/683300>
-" Last Change:	Sat Nov 05 12:00 PM 2011 EDT
+" Last Change:	Sat Nov 05 01:00 PM 2011 EDT
 
 " TODO:  strict checking for the name, description, core, dependencies lines.
 " Note that dependencies can specify version (in)equalities.
@@ -76,10 +76,6 @@ syn keyword  driniRequired	nextgroup=driniCoreEquals skipwhite skipempty core
 syn keyword  driniArray		nextgroup=driniDepIndex skipwhite skipempty dependencies
 syn keyword  driniPackage	nextgroup=driniEquals skipwhite skipempty datestamp project version
 
-" Keywords for the Profiler module.
-syn keyword  driniScalar	nextgroup=driniEquals skipwhite skipempty base
-syn keyword  driniArray	nextgroup=driniIndex skipwhite skipempty nodes terms users variables theme
-
 " After the keyword, need =, [], or [subkey].
 syn region driniIndex		contained oneline skipwhite skipempty
       \ nextgroup=driniIndex,driniEquals matchgroup=driniBracket start=/\[/ end=/]/
@@ -115,8 +111,9 @@ if s:initype == 'module' || s:initype == ''
     syn keyword  driniScalar	nextgroup=driniEquals skipwhite skipempty configure required
     syn keyword  driniArray	nextgroup=driniIndex skipwhite skipempty files scripts stylesheets
   endif
+endif
 
-elseif s:initype == 'theme' || s:initype == ''
+if s:initype == 'theme' || s:initype == ''
   " Remove the dependencies keyword.
   syn clear  driniArray
   syn keyword  driniScalar    nextgroup=driniEquals skipwhite skipempty engine package php screenshot
@@ -128,10 +125,17 @@ elseif s:initype == 'theme' || s:initype == ''
     syn keyword  driniScalar	nextgroup=driniEquals skipwhite skipempty hidden required
     syn keyword  driniArray	nextgroup=driniIndex skipwhite skipempty regions_hidden
   endif
+endif
 
-elseif s:initype == 'make' || s:initype == ''
+if s:initype == 'make' || s:initype == ''
   syn keyword  driniScalar	nextgroup=driniEquals skipwhite skipempty api
   syn keyword  driniArray	nextgroup=driniIndex skipwhite skipempty includes libraries projects
+endif
+
+if s:initype == ''
+  " Keywords for the Profiler module.
+  syn keyword  driniScalar	nextgroup=driniEquals skipwhite skipempty base
+  syn keyword  driniArray	nextgroup=driniIndex skipwhite skipempty nodes terms users variables theme
 endif
 
 syn match  driniComment		/^;.*$/
