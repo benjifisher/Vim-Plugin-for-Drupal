@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:	Configuration File (ini file) for Drupal, Drush
 " Author:	Benji Fisher <http://drupal.org/user/683300>
-" Last Change:	Sat Nov 05 11:00 AM 2011 EDT
+" Last Change:	Sat Nov 05 12:00 PM 2011 EDT
 
 " TODO:  strict checking for the name, description, core, dependencies lines.
 " Note that dependencies can specify version (in)equalities.
@@ -76,9 +76,8 @@ syn keyword  driniArray		nextgroup=driniDepIndex skipwhite skipempty dependencie
 syn keyword  driniPackage	nextgroup=driniEquals skipwhite skipempty datestamp project version
 
 " Keywords for the Profiler module.
-syn match    driniScalar	nextgroup=driniEquals skipwhite skipempty /\<base\>/
-syn keyword  driniArray	nextgroup=driniIndex skipwhite skipempty nodes terms users variables
-syn match    driniArray	nextgroup=driniIndex skipwhite skipempty /\<theme\>/
+syn keyword  driniScalar	nextgroup=driniEquals skipwhite skipempty base
+syn keyword  driniArray	nextgroup=driniIndex skipwhite skipempty nodes terms users variables theme
 
 " After the keyword, need =, [], or [subkey].
 syn region driniIndex		contained oneline skipwhite skipempty
@@ -120,9 +119,9 @@ elseif s:initype == 'theme' || s:initype == ''
   " Remove the dependencies keyword.
   syn clear  driniArray
   syn keyword  driniScalar    nextgroup=driniEquals skipwhite skipempty engine php screenshot
-  " Keywords cannot contain spaces.  Make "base" and "theme" matches, too, or
-  " 'base theme' will not work.  There is conflicting documentation ...
-  syn match    driniScalar	nextgroup=driniEquals skipwhite skipempty /\<base theme\>/
+  " The keyword "base" should be followed by "theme".
+  syn keyword  driniScalar    nextgroup=driniTheme skipwhite skipempty base
+  syn keyword  driniTheme     contained nextgroup=driniEquals skipwhite skipempty theme
   syn keyword  driniArray	nextgroup=driniIndex skipwhite skipempty features regions scripts stylesheets
   if !s:core || s:core >= 7
     syn keyword  driniScalar	nextgroup=driniEquals skipwhite skipempty hidden required
@@ -141,6 +140,7 @@ syn match  driniOverLength	/\%81v.*/ containedin=driniComment contained
 " Link all groups to the cluster that contains them.
 highlight default link  driniNormal	Normal
 
+highlight default link  driniTheme	driniScalar
 highlight default link  driniScalar	driniKeyword
 highlight default link  driniArray	driniKeyword
 highlight default link  driniRequired	driniKeyword
