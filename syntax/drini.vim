@@ -9,6 +9,7 @@
 " - modules (7.x):  http://drupal.org/node/542202
 " - modules (6.x):  http://drupal.org/node/231036
 " - themes (6.x, 7.x):  http://drupal.org/node/171205
+"   and http://drupal.org/node/1243144
 " - format (7.x):
 "   http://api.drupal.org/api/drupal/includes--common.inc/function/drupal_parse_info_format/7
 " - format (6.x):
@@ -118,13 +119,14 @@ if s:initype == 'module' || s:initype == ''
 elseif s:initype == 'theme' || s:initype == ''
   " Remove the dependencies keyword.
   syn clear  driniArray
-  syn keyword  driniScalar    nextgroup=driniEquals skipwhite skipempty engine php screenshot
+  syn keyword  driniScalar    nextgroup=driniEquals skipwhite skipempty engine package php screenshot
   " The keyword "base" should be followed by "theme".
   syn keyword  driniScalar    nextgroup=driniTheme skipwhite skipempty base
   syn keyword  driniTheme     contained nextgroup=driniEquals skipwhite skipempty theme
-  syn keyword  driniArray	nextgroup=driniIndex skipwhite skipempty features regions scripts stylesheets
+  syn keyword  driniArray	nextgroup=driniIndex skipwhite skipempty features regions scripts settings stylesheets
   if !s:core || s:core >= 7
     syn keyword  driniScalar	nextgroup=driniEquals skipwhite skipempty hidden required
+    syn keyword  driniArray	nextgroup=driniIndex skipwhite skipempty regions_hidden
   endif
 
 elseif s:initype == 'make' || s:initype == ''
