@@ -20,17 +20,17 @@ $ tar xzf path/to/ultimate_vimrc.tgz --strip-components 1 --exclude=README.txt
 When you are done, you should have the following directory structure inside your
 vimfiles directory:
 
-	doc/drupal.txt
-	ftdetect/drupal.vim
-	ftplugin/drupal.vim
-	plugin/drupal.vim
+        doc/drupal.txt
+        ftdetect/drupal.vim
+        ftplugin/drupal.vim
+        plugin/drupal.vim
 
 In order to use the tags defined in the help file, start vim and do
-	:helptags ~/.vim/doc
+        :helptags ~/.vim/doc
 (assuming that the file is installed as ~/.vim/doc/drupal.txt).  See
-	:help add-local-help
+        :help add-local-help
 for details.  After this step, you should be able to read the documentation with
-	:help drupal.txt
+        :help drupal.txt
 
 UPDATES AND SUPPORT
 
@@ -74,8 +74,8 @@ NOTE: Windows users should use ~\vimfiles instead of ~/.vimrc.  You will
 probably need a method other than cat.
 
 2) Create a vimrc file and add these two lines inside it:
-	source path/to/vimrc/plugin/drupal.vim
-	source path/to/vimrc/ftplugin/php_drupal.vim
+        source path/to/vimrc/plugin/drupal.vim
+        source path/to/vimrc/ftplugin/php_drupal.vim
 NOTE: Where path/to/vimrc is where you extracted the contents of this project.
 
 * Info on tiny-vim
