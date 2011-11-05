@@ -70,8 +70,8 @@ syn match    driniNormal "\S.*"
 " a more specific variant.
 
 " Keywords common to all file types.
-syn keyword  driniKey	nextgroup=driniEquals skipwhite skipempty name
-syn keyword  driniKey	nextgroup=driniEquals skipwhite skipempty description
+syn keyword  driniKey	nextgroup=driniNameEquals skipwhite skipempty name
+syn keyword  driniKey	nextgroup=driniDescEquals skipwhite skipempty description
 syn keyword  driniKey	nextgroup=driniCoreEquals skipwhite skipempty core
 syn keyword  driniKey	nextgroup=driniDepIndex skipwhite skipempty dependencies
 syn keyword  driniKey	nextgroup=driniEquals skipwhite skipempty datestamp project version
@@ -80,24 +80,39 @@ syn keyword  driniKey	nextgroup=driniEquals skipwhite skipempty datestamp projec
 syn region driniIndex		contained oneline skipwhite skipempty
       \ nextgroup=driniIndex,driniEquals matchgroup=driniBracket start=/\[/ end=/]/
 syn region driniDepIndex	contained oneline skipwhite skipempty
-      \ nextgroup=driniDepIndex,driniDepEquals matchgroup=driniDepBracket start=/\[/ end=/]/
+      \ nextgroup=driniDepIndex,driniDepEquals matchgroup=driniBracket start=/\[/ end=/]/
 syn match  driniEquals		contained skipwhite skipempty nextgroup=@driniValue /=/
 syn match  driniCoreEquals	contained skipwhite skipempty nextgroup=driniCoreValue /=/
 syn match  driniDepEquals	contained skipwhite skipempty
       \ nextgroup=driniDepValue,driniDepString /=/
+syn match  driniDescEquals	contained skipwhite skipempty
+      \ nextgroup=driniDescValue,driniDescString /=/
+syn match  driniNameEquals	contained skipwhite skipempty
+      \ nextgroup=driniNameValue,driniNameString /=/
 
 " After the =, either Value or "Value" or 'Value'.  Strings may span lines.
 syn cluster  driniValue    	contains=driniString,driniRHS
 syn match  driniCoreValue	contained /\(['"]\)\=\d\+\.x\1/
 syn match  driniDepValue	contained skipwhite skipempty
       \ nextgroup=driniDepVersion,driniNormal /[a-z_.]\+/
+" The description should start with an uppercase letter, end with a period,
+" and be no more than 255 characters in total.
+syn match  driniDescValue	contained /\u\_.\{,253}\./
+" The name should start with an uppercase letter and the rest should be
+" lowercase letters and spaces.
+syn match  driniNameValue	contained nextgroup=driniNormal /\u[a-z ]*/
 syn region driniDepVersion	contained oneline contains=driniDepVerNo
       \ skipwhite nextgroup=driniNormal matchgroup=driniDepParen start=/(/ end=/)/
 syn match  driniDepVerNo	contained
       \ /\(\([=><!]\?=\|[=><]\)\s*\)\=\d\+\.\(x\|\d\+\)/
 syn region driniDepString	contained oneline contains=driniDepValue,driniDepVersion
       \ skipwhite nextgroup=driniNormal start=/\z(["']\)/ skip=/\\\z1/ end=/\z1/
-syn region driniString		contained skipwhite nextgroup=driniNormal start=/\z(["']\)/ skip=/\\\z1/ end=/\z1/
+syn region driniDescString	contained contains=driniDescValue keepend
+      \ skipwhite nextgroup=driniNormal start=/\z(["']\)/ skip=/\\\z1/ end=/\z1/
+syn region driniNameString	contained oneline contains=driniNameValue
+      \ skipwhite nextgroup=driniNormal start=/\z(["']\)/ skip=/\\\z1/ end=/\z1/
+syn region driniString		contained skipwhite nextgroup=driniNormal
+      \ start=/\z(["']\)/ skip=/\\\z1/ end=/\z1/
 syn match  driniRHS		contained /[^\t "';].*/
 
 let s:initype = s:IniType()
@@ -147,20 +162,26 @@ highlight default link  driniNormal	Normal
 highlight default link  driniTheme	driniKey
 highlight default link  driniKey	Keyword
 
-highlight default link  driniDepBracket	driniBracket
 highlight default link  driniBracket	Operator
 highlight default link  driniDepIndex	driniIndex
 highlight default link  driniIndex	String
 highlight default link  driniCoreEquals	driniEquals
 highlight default link  driniDepEquals	driniEquals
+highlight default link  driniDescEquals	driniEquals
+highlight default link  driniNameEquals	driniEquals
 highlight default link  driniEquals	Operator
 highlight default link  driniCoreValue	driniRHS
 highlight default link  driniDepValue	driniRHS
+highlight default link  driniDescValue	driniRHS
+highlight default link  driniNameValue	driniRHS
 highlight default link  driniDepVersion	Normal
 highlight default link  driniDepVerNo	WarningMsg
 highlight default link  driniDepParen	Operator
 highlight default link  driniRHS	String
+highlight default link  driniCoreString	driniString
 highlight default link  driniDepString	Normal
+highlight default link  driniDescString	Normal
+highlight default link  driniNameString	Normal
 highlight default link  driniString	String
 
 highlight default link	driniComment	Comment
