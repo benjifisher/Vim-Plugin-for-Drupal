@@ -1,7 +1,7 @@
 " Vim syntax file
-" Language:	Configuration File (ini file) for Drupal, Drush
-" Author:	Benji Fisher <http://drupal.org/user/683300>
-" Last Change:	Sat Nov 05 03:00 PM 2011 EDT
+" Language:     Configuration File (ini file) for Drupal, Drush
+" Author:       Benji Fisher <http://drupal.org/user/683300>
+" Last Change: Sat Nov 05 10:00 PM 2011 EDT
 
 " References:
 " - modules (7.x):  http://drupal.org/node/542202
@@ -55,7 +55,7 @@ function! s:IniType()
       let type = 'module'
     elseif m_index < t_index
       let type = 'theme'
-    else	" We are not inside a themes/ directory, nor a mudules/ directory.  Do not guess.
+    else        " We are not inside a themes/ directory, nor a mudules/ directory.  Do not guess.
       let type = ''
     endif
   endif
@@ -64,130 +64,133 @@ endfun
 
 " Unless there is a more specific match, the entire line will be given Normal
 " highlighting.
-syn match    driniNormal "\S.*"
+syn match driniNormal     "\S.*"
+syn match driniComment    "^;.*$"
+syn match driniOverLength "\%81v.*" containedin=driniComment contained
 
-" Each keyword declares nextgroup=driniEquals or nextgroup=driniIndex or
-" a more specific variant.
-
-" Keywords common to all file types.
-syn keyword  driniKey	nextgroup=driniNameEquals skipwhite skipempty name
-syn keyword  driniKey	nextgroup=driniDescEquals skipwhite skipempty description
-syn keyword  driniKey	nextgroup=driniCoreEquals skipwhite skipempty core
-syn keyword  driniKey	nextgroup=driniDepIndex skipwhite skipempty dependencies
-syn keyword  driniKey	nextgroup=driniEquals skipwhite skipempty datestamp project version
-
-" After the keyword, need =, [], or [subkey].
-syn region driniIndex		contained oneline skipwhite skipempty
-      \ nextgroup=driniIndex,driniEquals matchgroup=driniBracket start=/\[/ end=/]/
-syn region driniDepIndex	contained oneline skipwhite skipempty
-      \ nextgroup=driniDepIndex,driniDepEquals matchgroup=driniBracket start=/\[/ end=/]/
-syn match  driniEquals		contained skipwhite skipempty nextgroup=@driniValue /=/
-syn match  driniCoreEquals	contained skipwhite skipempty nextgroup=driniCoreValue /=/
-syn match  driniDepEquals	contained skipwhite skipempty
-      \ nextgroup=driniDepValue,driniDepString /=/
-syn match  driniDescEquals	contained skipwhite skipempty
-      \ nextgroup=driniDescValue,driniDescString /=/
-syn match  driniNameEquals	contained skipwhite skipempty
-      \ nextgroup=driniNameValue,driniNameString /=/
-
+" Here is the basic pattern.  Note the use of nextgroup and contained.
 " After the =, either Value or "Value" or 'Value'.  Strings may span lines.
-syn cluster  driniValue    	contains=driniString,driniRHS
-syn match  driniCoreValue	contained /\(['"]\)\=\d\+\.x\1/
-syn match  driniDepValue	contained skipwhite skipempty
-      \ nextgroup=driniDepVersion,driniNormal /[a-z_.]\+/
-" The description should start with an uppercase letter, end with a period,
-" and be no more than 255 characters in total.
-syn match  driniDescValue	contained /\u.\{,253}\./
-syn match  driniDescLong	contained /\u\_.\{,253}\./
+syn keyword  driniKey    nextgroup=driniEquals skipwhite skipempty datestamp project version
+syn match    driniEquals contained skipwhite skipempty nextgroup=@driniValue "="
+syn cluster  driniValue  contains=driniString,driniRHS
+syn region   driniString contained skipwhite nextgroup=driniNormal
+      \ start=/\z(["']\)/ skip=/\\\z1/ end=/\z1/
+syn match    driniRHS    contained /[^\t "';].*/
+
+" After some keywords, need [] or [subkey].
+syn region driniIndex contained oneline skipwhite skipempty
+      \ nextgroup=driniIndex,driniEquals matchgroup=driniBracket start="\[" end="]"
+
+" These variants on the pattern let us restrict the syntax of the values.
+
 " The name should start with an uppercase letter and the rest should be
 " lowercase letters and spaces.
-syn match  driniNameValue	contained nextgroup=driniNormal /\u[a-z ]*/
-syn region driniDepVersion	contained oneline contains=driniDepVerNo
-      \ skipwhite nextgroup=driniNormal matchgroup=driniDepParen start=/(/ end=/)/
-syn match  driniDepVerNo	contained
-      \ /\(\([=><!]\?=\|[=><]\)\s*\)\=\d\+\.\(x\|\d\+\)/
-syn region driniDepString	contained oneline contains=driniDepValue,driniDepVersion
+syn keyword  driniKey        nextgroup=driniNameEquals skipwhite skipempty name
+syn match    driniNameEquals contained skipwhite skipempty
+      \ nextgroup=driniNameValue,driniNameString "="
+syn match    driniNameValue  contained nextgroup=driniNormal "\u[a-z ]*"
+syn region   driniNameString contained oneline contains=driniNameValue
       \ skipwhite nextgroup=driniNormal start=/\z(["']\)/ skip=/\\\z1/ end=/\z1/
-syn region driniDescString	contained contains=driniDescLong keepend
+
+" The description should start with an uppercase letter, end with a period,
+" and be no more than 255 characters in total.
+syn keyword  driniKey        nextgroup=driniDescEquals skipwhite skipempty description
+syn match    driniDescEquals contained skipwhite skipempty
+      \ nextgroup=driniDescValue,driniDescString "="
+syn match    driniDescValue  contained "\u.\{,253}\."
+syn match    driniDescLong   contained "\u\_.\{,253}\."
+syn region   driniDescString contained contains=driniDescLong keepend
       \ skipwhite nextgroup=driniNormal start=/\z(["']\)/ skip=/\\\z1/ end=/\z1/
-syn region driniNameString	contained oneline contains=driniNameValue
+
+syn keyword  driniKey        nextgroup=driniCoreEquals skipwhite skipempty core
+syn match    driniCoreEquals contained skipwhite skipempty nextgroup=driniCoreValue "="
+syn match    driniCoreValue  contained /\(['"]\)\=\d\+\.x\1/
+
+" The optional version can be as simple as (2.1) or as complicated as
+" (>1.0, <=3.2, !=3.0,)
+syn keyword  driniKey        nextgroup=driniDepIndex skipwhite skipempty dependencies
+syn region   driniDepIndex   contained oneline skipwhite skipempty
+      \ nextgroup=driniDepIndex,driniDepEquals matchgroup=driniBracket start="\[" end="]"
+syn match    driniDepEquals  contained skipwhite skipempty
+      \ nextgroup=driniDepValue,driniDepString "="
+syn match    driniDepValue   contained skipwhite skipempty
+      \ nextgroup=driniDepVersion,driniNormal "[a-z_.]\+"
+syn region   driniDepVersion contained oneline contains=driniDepVerNo
+      \ skipwhite nextgroup=driniNormal matchgroup=driniDepParen start="(" end=")"
+syn match    driniDepVerNo   contained
+      \ "\(\([=><!]\?=\|[=><]\)\s*\)\=\d\+\.\(x\|\d\+\)"
+syn region   driniDepString  contained oneline contains=driniDepValue,driniDepVersion
       \ skipwhite nextgroup=driniNormal start=/\z(["']\)/ skip=/\\\z1/ end=/\z1/
-syn region driniString		contained skipwhite nextgroup=driniNormal
-      \ start=/\z(["']\)/ skip=/\\\z1/ end=/\z1/
-syn match  driniRHS		contained /[^\t "';].*/
 
 let [s:core, s:initype] = s:IniType()
 
 if s:initype == 'module' || s:initype == ''
   if !s:core || s:core >= 6
-    syn keyword  driniKey	nextgroup=driniEquals skipwhite skipempty hidden package php
+    syn keyword driniKey nextgroup=driniEquals skipwhite skipempty hidden package php
   endif
 
   if !s:core || s:core >= 7
-    syn keyword  driniKey	nextgroup=driniEquals skipwhite skipempty configure required
-    syn keyword  driniKey	nextgroup=driniIndex skipwhite skipempty files scripts stylesheets
+    syn keyword driniKey nextgroup=driniEquals skipwhite skipempty configure required
+    syn keyword driniKey nextgroup=driniIndex skipwhite skipempty files scripts stylesheets
   endif
 endif
 
 if s:initype == 'theme' || s:initype == ''
-  syn keyword  driniKey   nextgroup=driniEquals skipwhite skipempty engine package php screenshot
+  syn keyword driniKey   nextgroup=driniEquals skipwhite skipempty engine package php screenshot
   " The keyword "base" should be followed by "theme".
-  syn keyword  driniKey   nextgroup=driniTheme skipwhite skipempty base
-  syn keyword  driniTheme     contained nextgroup=driniEquals skipwhite skipempty theme
-  syn keyword  driniKey   nextgroup=driniIndex skipwhite skipempty features regions scripts settings stylesheets
+  syn keyword driniKey   nextgroup=driniTheme skipwhite skipempty base
+  syn keyword driniTheme contained nextgroup=driniEquals skipwhite skipempty theme
+  syn keyword driniKey   nextgroup=driniIndex skipwhite skipempty features regions scripts settings stylesheets
   if !s:core || s:core >= 7
-    syn keyword  driniKey	nextgroup=driniEquals skipwhite skipempty hidden required
-    syn keyword  driniKey	nextgroup=driniIndex skipwhite skipempty regions_hidden
+    syn keyword driniKey nextgroup=driniEquals skipwhite skipempty hidden required
+    syn keyword driniKey nextgroup=driniIndex skipwhite skipempty regions_hidden
   endif
 endif
 
 if s:initype == 'make' || s:initype == ''
-  syn keyword  driniKey	nextgroup=driniEquals skipwhite skipempty api
-  syn keyword  driniKey	nextgroup=driniIndex skipwhite skipempty includes libraries projects
+  syn keyword driniKey nextgroup=driniEquals skipwhite skipempty api
+  syn keyword driniKey nextgroup=driniIndex skipwhite skipempty includes libraries projects
 endif
 
 if s:initype == ''
   " Keywords for the Profiler module.
-  syn keyword  driniKey	nextgroup=driniEquals skipwhite skipempty base
-  syn keyword  driniKey	nextgroup=driniIndex skipwhite skipempty nodes terms users variables theme
+  syn keyword driniKey nextgroup=driniEquals skipwhite skipempty base
+  syn keyword driniKey nextgroup=driniIndex skipwhite skipempty nodes terms users variables theme
 endif
-
-syn match  driniComment		/^;.*$/
-syn match  driniOverLength	/\%81v.*/ containedin=driniComment contained
 
 " Define the default highlighting.  The 'default' keyword requires vim 5.8+.
 
 " Link all groups to the cluster that contains them.
-highlight default link  driniNormal	Normal
+highlight default link  driniNormal     Normal
 
-highlight default link  driniTheme	driniKey
-highlight default link  driniKey	Keyword
+highlight default link  driniTheme      driniKey
+highlight default link  driniKey        Keyword
 
-highlight default link  driniBracket	Operator
-highlight default link  driniDepIndex	driniIndex
-highlight default link  driniIndex	String
-highlight default link  driniCoreEquals	driniEquals
-highlight default link  driniDepEquals	driniEquals
-highlight default link  driniDescEquals	driniEquals
-highlight default link  driniNameEquals	driniEquals
-highlight default link  driniEquals	Operator
-highlight default link  driniCoreValue	driniRHS
-highlight default link  driniDepValue	driniRHS
-highlight default link  driniDescLong	driniRHS
-highlight default link  driniDescValue	driniRHS
-highlight default link  driniNameValue	driniRHS
-highlight default link  driniDepVersion	Normal
-highlight default link  driniDepVerNo	WarningMsg
-highlight default link  driniDepParen	Operator
-highlight default link  driniRHS	String
-highlight default link  driniCoreString	driniString
-highlight default link  driniDepString	Normal
-highlight default link  driniDescString	Normal
-highlight default link  driniNameString	Normal
-highlight default link  driniString	String
+highlight default link  driniBracket    Operator
+highlight default link  driniDepIndex   driniIndex
+highlight default link  driniIndex      String
+highlight default link  driniCoreEquals driniEquals
+highlight default link  driniDepEquals  driniEquals
+highlight default link  driniDescEquals driniEquals
+highlight default link  driniNameEquals driniEquals
+highlight default link  driniEquals     Operator
+highlight default link  driniCoreValue  driniRHS
+highlight default link  driniDepValue   driniRHS
+highlight default link  driniDescLong   driniRHS
+highlight default link  driniDescValue  driniRHS
+highlight default link  driniNameValue  driniRHS
+highlight default link  driniDepVersion Normal
+highlight default link  driniDepVerNo   WarningMsg
+highlight default link  driniDepParen   Operator
+highlight default link  driniRHS        String
+highlight default link  driniCoreString driniString
+highlight default link  driniDepString  Normal
+highlight default link  driniDescString Normal
+highlight default link  driniNameString Normal
+highlight default link  driniString     String
 
-highlight default link	driniComment	Comment
-highlight default link	driniOverLength	Error
+highlight default link  driniComment    Comment
+highlight default link  driniOverLength Error
 
 let b:current_syntax = "drini"
 
