@@ -6,7 +6,7 @@ syn match drupalOverLength "\%>80v.*" containedin=@drupalComment contained
 syn match drupalOverLength "\%81v.*\*\/"me=e-2 containedin=@drupalComment contained
 " Add <syntax>Comment.* to the @drupalComment cluster for all applicable
 " syntax types.
-execute 'syn cluster drupalComment contains=' . 
+execute 'syn cluster drupalComment contains=' .
       \ substitute(&syntax, '\.\|$', 'Comment.*,', 'g')
 
 highlight default link drupalOverLength Error
