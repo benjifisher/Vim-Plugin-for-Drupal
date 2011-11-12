@@ -21,9 +21,51 @@ setl formatoptions+=croql
 " Custom SVN blame
 vmap <buffer> gl :<C-U>!svn blame <C-R>=expand("%:P") <CR> \| sed -n <C-R>=line("'<") <CR>,<C-R>=line("'>") <CR>p <CR>
 
-" Lookup the API docs for a drupal function under cursor.
-nnoremap <buffer> <LocalLeader>da :execute "!open http://api.drupal.org/".shellescape(expand("<cword>"), 1)<CR>
-" Lookup the API docs for a drush function under cursor.
-nnoremap <buffer> <LocalLeader>dda :execute "!open http://api.drush.ws/api/function/".shellescape(expand("<cword>"), 1)<CR>
+" Return a string that can be used to open URL's (and other things).
+" Usage:
+" let open = s:OpenCommand()
+" if strlen(open) | execute '!' . open . ' http://example.com' | endif
+" See http://www.dwheeler.com/essays/open-files-urls.html
+if !exists('*s:OpenCommand')
+
+function s:OpenCommand()
+if has('macunix') && executable('open')
+  return 'open'
+endif
+if has('win32unix') && executable('cygstart')
+  return 'cygstart'
+endif
+if has('unix') && executable('xdg-open')
+  return 'xdg-open'
+endif
+if (has('win32') || has('win64')) && executable('cmd')
+  return 'cmd /c start'
+endif
+  return ''
+endfun
+
+function s:OpenURL(base)
+  let open = s:OpenCommand()
+  if open == ''
+    return
+  endif
+  let func =  shellescape(expand('<cword>'))
+  if a:base == 'api.d.o'
+    execute '!' . open . ' http://api.drupal.org/' . func
+  else
+    execute '!' . open . ' ' . a:base . func
+  endif
+endfun
+
+endif " !exists('*s:OpenCommand')
+
+if strlen(s:OpenCommand())
+  " Lookup the API docs for a drupal function under cursor.
+  nnoremap <buffer> <LocalLeader>da :silent call <SID>OpenURL('api.d.o')<CR><C-L>
+
+  " Lookup the API docs for a drush function under cursor.
+  nnoremap <buffer> <LocalLeader>dda :silent call <SID>OpenURL('http://api.drush.ws/api/function/')<CR><C-L>
+endif
+
 " Get the value of the drupal variable under cursor.
 nnoremap <buffer> <LocalLeader>dv :execute "!drush vget ".shellescape(expand("<cword>"), 1)<CR>
