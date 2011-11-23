@@ -21,45 +21,40 @@ setl formatoptions+=croql
 " Custom SVN blame
 vmap <buffer> gl :<C-U>!svn blame <C-R>=expand("%:P") <CR> \| sed -n <C-R>=line("'<") <CR>,<C-R>=line("'>") <CR>p <CR>
 
-" Return a string that can be used to open URL's (and other things).
-" Usage:
-" let open = s:OpenCommand()
-" if strlen(open) | execute '!' . open . ' http://example.com' | endif
-" See http://www.dwheeler.com/essays/open-files-urls.html
-if !exists('*s:OpenCommand')
+" {{{ @var $DRUPAL_ROOT
+" plugin/drupal.vim defines several useful strings in b:Drupal_info.
+" There is no such thing as buffer-local environment variables, so call this
+" each time you enter a Drupal buffer.
+augroup Drupal
+  autocmd BufEnter <buffer> if strlen(b:Drupal_info.DRUPAL_ROOT) |
+	\ let $DRUPAL_ROOT = b:Drupal_info.DRUPAL_ROOT | endif
+augroup END
+do BufEnter <buffer>
+" }}}
 
-function s:OpenCommand()
-if has('macunix') && executable('open')
-  return 'open'
-endif
-if has('win32unix') && executable('cygstart')
-  return 'cygstart'
-endif
-if has('unix') && executable('xdg-open')
-  return 'xdg-open'
-endif
-if (has('win32') || has('win64')) && executable('cmd')
-  return 'cmd /c start'
-endif
-  return ''
-endfun
+if !exists('*s:OpenURL')
 
 function s:OpenURL(base)
-  let open = s:OpenCommand()
+  let open = b:Drupal_info.OPEN_COMMAND
   if open == ''
     return
   endif
   let func =  shellescape(expand('<cword>'))
   if a:base == 'api.d.o'
-    execute '!' . open . ' http://api.drupal.org/' . func
+    if strlen(b:Drupal_info.CORE)
+      execute '!' . open . ' http://api.drupal.org/api/search/' .
+	    \ b:Drupal_info.CORE . '/' . func
+    else
+      execute '!' . open . ' http://api.drupal.org/' . func
+    endif
   else
     execute '!' . open . ' ' . a:base . func
   endif
 endfun
 
-endif " !exists('*s:OpenCommand')
+endif " !exists('*s:OpenURL')
 
-if strlen(s:OpenCommand())
+if strlen(b:Drupal_info.OPEN_COMMAND)
   " Lookup the API docs for a drupal function under cursor.
   nnoremap <buffer> <LocalLeader>da :silent call <SID>OpenURL('api.d.o')<CR><C-L>
 

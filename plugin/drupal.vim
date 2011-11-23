@@ -48,20 +48,26 @@ map <S-u> :redo<cr>
 map <C-n> :tabn<cr>
 map <C-p> :tabp<cr>
 
-" Uncomment the following to have Vim jump to the last position when
-" reopening a file
-if has("autocmd")
- au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
- \| exe "normal! g'\"" | endif
+" {{{
+" Everything from here on assumes that autocommands are available.
+" }}}
+if !has("autocmd")
+  finish
 endif
 
-if has("autocmd")
+" Uncomment the following to have Vim jump to the last position when
+" reopening a file
+au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
+      \| exe "normal! g'\"" | endif
+
 augroup Drupal
   " Remove ALL autocommands for the Drupal group.
   autocmd!
-  " Add drupal as a secondary filetype.  This will load the ftplugins and syntax
-  " files drupal.vim after the usual ones.
-  autocmd FileType php,css,javascript,dosini set ft+=.drupal
+  " s:DrupalInit() will create the buffer-local Dictionary b:Drupal_info
+  " containing useful information for ftplugins and syntax files.  It will
+  " also add drupal as a secondary filetype.  This will load the ftplugins and
+  " syntax files drupal.vim after the usual ones.
+  autocmd FileType php,css,javascript,dosini call s:DrupalInit()
 
   " Highlight trailing whitespace.
   autocmd BufWinEnter * call s:ToggleWhitespaceMatch('BufWinEnter')
@@ -93,4 +99,161 @@ function! s:ToggleWhitespaceMatch(event)
     call matchadd('drupalExtraWhitespace', '\s\+$', 10, w:whitespace_match_number)
   endif
 endfunction
-endif " has("autocmd")
+
+" {{{ @function s:DrupalInit()
+" Save some information in the buffer-local Dictionary b:Drupal_info for use
+" by ftplugin and syntax scripts.  The keys are
+" - DRUPAL_ROOT
+"   path to the Drupal root
+" - INFO_FILE
+"   path to the .info file of the containing module, theme, etc.
+" - TYPE
+"   'module' or 'theme' or 'make'
+" - OPEN_COMMAND
+"   'open' or 'xdg-open' or 'cmd /c start', depending on the OS
+" In all cases, the values will be '' if we cannot make a reasonable guess.
+" {{{
+function! s:DrupalInit()
+  " Expect something like /var/www/drupal-7.9/sites/all/modules/ctools
+  " TODO:  Do we get / or \ on Windows?
+  let path = expand('%:p')
+  let directory = fnamemodify(path, ':h')
+  let info = {'DRUPAL_ROOT': s:DrupalRoot(directory),
+	\ 'INFO_FILE': s:InfoPath(directory)}
+  let info.CORE = s:CoreVersion(info.INFO_FILE)
+  let info.TYPE = s:IniType(info.INFO_FILE)
+  let info.OPEN_COMMAND = s:OpenCommand()
+
+  " @var b:Drupal_info
+  let b:Drupal_info = info
+  " TODO:  If we are not inside a Drupal directory, maybe skip this.  Wait
+  " until someone complains that we are munging his non-Drupal php files.
+  set ft+=.drupal
+endfun
+" }}} }}}
+
+" {{{ @function s:IniType()
+" Try to guess which part of the path is the Drupal root directory.
+"
+" @param path
+"   A string representing a system path.
+"
+" @return
+"   A string representing the Drupal root, '' if not found.
+" {{{
+function! s:DrupalRoot(path)
+  let droot = ''
+  " TODO: replace \ with / for Windows?
+  for part in split(a:path, '/')
+    let droot .= '/' . part
+    let ls = glob(droot . '/{index.php,cron.php,modules,themes,sites}')
+    " If all the parts are there, then ls should have 3 \n characters.
+    if strlen(substitute(ls, "[^\<C-J>]", '', 'g')) == 4
+      return droot
+    endif
+  endfor
+  return ''
+endfun
+" }}} }}}
+
+" {{{ @function s:IniType()
+" Try to find the .info file of the module, theme, etc. containing a path.
+"
+" @param path
+"   A string representing a system path.
+"
+" @return
+"   A string representing the path of the .info file, '' if not found.
+" {{{
+function! s:InfoPath(path)
+  let dir = a:path
+  " TODO: replace \ with / for Windows?
+  while strlen(dir)
+    let infopath = glob(dir . '/*.{info,make,build}')
+    if strlen(infopath)
+      return infopath
+    endif
+    " No luck yet, so go up one directory.
+    let dir = substitute(dir, '\/[^/]*$', '', '')
+  endwhile
+  return ''
+endfun
+" }}} }}}
+
+" Return a string that can be used to open URL's (and other things).
+" Usage:
+" let open = s:OpenCommand()
+" if strlen(open) | execute '!' . open . ' http://example.com' | endif
+" See http://www.dwheeler.com/essays/open-files-urls.html
+function! s:OpenCommand()
+if has('macunix') && executable('open')
+  return 'open'
+endif
+if has('win32unix') && executable('cygstart')
+  return 'cygstart'
+endif
+if has('unix') && executable('xdg-open')
+  return 'xdg-open'
+endif
+if (has('win32') || has('win64')) && executable('cmd')
+  return 'cmd /c start'
+endif
+  return ''
+endfun
+
+" {{{ @function s:CoreVersion(info_path)
+" Find the version of Drupal core by parsing the .info file.
+"
+" @param info_path
+"   A string representing the path to the .info file.
+"
+" @return
+"   A numeric string representing the Drupal core version.
+" {{{
+function! s:CoreVersion(info_path)
+  " Find the Drupal core version.
+  if a:info_path == '' || !filereadable(a:info_path)
+    return ''
+  endif
+  let lines = readfile(a:info_path, '', 500)
+  let core_re = '^\s*core\s*=\s*\zs\d\+\ze\.x\s*$'
+  let core_line = matchstr(lines, core_re)
+  return matchstr(core_line, core_re)
+endfun
+" }}} }}}
+
+" {{{ @function s:IniType(info_path)
+" Find the type (module, theme, make) by parsing the path.
+"
+" @param info_path
+"   A string representing the path to the .info file.
+"
+" @return
+"   A string:  module, theme, make
+" {{{
+" TODO:  How do we recognize a Profiler .info file?
+function! s:IniType(info_path)
+  let ext = fnamemodify(a:info_path, ':e')
+  if ext == 'make' || ext == 'build'
+    return 'make'
+  else
+    " If the extension is not 'info' at this point, I do not know how we got
+    " here.
+    let m_index = strridx(a:info_path, '/modules/')
+    let t_index = strridx(a:info_path, '/themes/')
+    " If neither matches, try a case-insensitive search.
+    if m_index == -1 && t_index == -1
+      let m_index = matchend(a:info_path, '\c.*\/modules\/')
+      let t_index = matchend(a:info_path, '\c.*\/themes\/')
+    endif
+    if m_index > t_index
+      return 'module'
+    elseif m_index < t_index
+      return 'theme'
+    endif
+    " We are not inside a themes/ directory, nor a modules/ directory.  Do not
+    " guess.
+    return ''
+  endif
+endfun
+" }}} }}}
