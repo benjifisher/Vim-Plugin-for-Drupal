@@ -32,6 +32,15 @@ augroup END
 do BufEnter <buffer>
 " }}}
 
+" The tags file can be used for PHP omnicompletion even if $DRUPAL_ROOT == ''.
+" If $DRUPAL_ROOT is set correctly, then the tags file can be used for tag
+" searches.
+" TODO:  If we do not know which version of Drupal core, add no tags file or
+" all?
+if strlen(b:Drupal_info.CORE)
+  let &tags .= ',' . expand('<sfile>:p:h:h') . '/drupal' . b:Drupal_info.CORE . '.tags'
+endif
+
 if !exists('*s:OpenURL')
 
 function s:OpenURL(base)
