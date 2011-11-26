@@ -100,6 +100,9 @@ function! s:ToggleWhitespaceMatch(event)
   endif
 endfunction
 
+" Borrowed from autoload/pathogen.vim:
+let s:slash = !exists("+shellslash") || &shellslash ? '/' : '\'
+
 " {{{ @function s:DrupalInit()
 " Save some information in the buffer-local Dictionary b:Drupal_info for use
 " by ftplugin and syntax scripts.  The keys are
@@ -115,7 +118,6 @@ endfunction
 " {{{
 function! s:DrupalInit()
   " Expect something like /var/www/drupal-7.9/sites/all/modules/ctools
-  " TODO:  Do we get / or \ on Windows?
   let path = expand('%:p')
   let directory = fnamemodify(path, ':h')
   let info = {'DRUPAL_ROOT': s:DrupalRoot(directory),
@@ -143,10 +145,9 @@ endfun
 " {{{
 function! s:DrupalRoot(path)
   let droot = ''
-  " TODO: replace \ with / for Windows?
-  for part in split(a:path, '/')
-    let droot .= '/' . part
-    let ls = glob(droot . '/{index.php,cron.php,modules,themes,sites}')
+  for part in split(a:path, s:slash)
+    let droot .= s:slash . part
+    let ls = glob(droot . s:slash . '{index.php,cron.php,modules,themes,sites}')
     " If all the parts are there, then ls should have 3 \n characters.
     if strlen(substitute(ls, "[^\<C-J>]", '', 'g')) == 4
       return droot
@@ -167,14 +168,13 @@ endfun
 " {{{
 function! s:InfoPath(path)
   let dir = a:path
-  " TODO: replace \ with / for Windows?
   while strlen(dir)
-    let infopath = glob(dir . '/*.{info,make,build}')
+    let infopath = glob(dir . s:slash . '*.{info,make,build}')
     if strlen(infopath)
       return infopath
     endif
     " No luck yet, so go up one directory.
-    let dir = substitute(dir, '\/[^/]*$', '', '')
+    let dir = substitute(dir, '\' . s:slash . '[^' . s:slash . ']*$', '', '')
   endwhile
   return ''
 endfun
@@ -239,12 +239,12 @@ function! s:IniType(info_path)
   else
     " If the extension is not 'info' at this point, I do not know how we got
     " here.
-    let m_index = strridx(a:info_path, '/modules/')
-    let t_index = strridx(a:info_path, '/themes/')
+    let m_index = strridx(a:info_path, s:slash . 'modules' . s:slash)
+    let t_index = strridx(a:info_path, s:slash . 'themes' . s:slash)
     " If neither matches, try a case-insensitive search.
     if m_index == -1 && t_index == -1
-      let m_index = matchend(a:info_path, '\c.*\/modules\/')
-      let t_index = matchend(a:info_path, '\c.*\/themes\/')
+      let m_index = matchend(a:info_path, '\c.*\' . s:slash . 'modules\' . s:slash)
+      let t_index = matchend(a:info_path, '\c.*\' . s:slash . 'themes\' . s:slash)
     endif
     if m_index > t_index
       return 'module'
