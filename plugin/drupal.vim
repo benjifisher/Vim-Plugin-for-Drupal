@@ -116,12 +116,22 @@ endfun
 "   A string representing the Drupal root, '' if not found.
 " {{{
 function! s:DrupalRoot(path)
-  let droot = ''
-  for part in split(a:path, s:slash)
+  let markers = ['index.php', 'cron.php', 'modules', 'themes', 'sites']
+  " On *nix, start with '', but on Windows typically start with 'C:'.
+  let droot = matchstr(a:path, '[^\' . s:slash . ']*')
+  for part in split(matchstr(a:path, '\' . s:slash . '.*'), s:slash)
     let droot .= s:slash . part
-    let ls = glob(droot . s:slash . '{index.php,cron.php,modules,themes,sites}')
-    " If all the parts are there, then ls should have 3 \n characters.
-    if strlen(substitute(ls, "[^\<C-J>]", '', 'g')) == 4
+    " This would be easier if it did not have to work on Windows.
+    let ls = glob(droot . s:slash . '*')
+    let is_drupal_root = 1
+    for marker in markers
+      if match(ls, '\' . s:slash . marker . "\<C-J>") == -1
+	let is_drupal_root = 0
+	break
+      endif
+    endfor
+    " If all the markers are there, then this looks like a Drupal root.
+    if is_drupal_root
       return droot
     endif
   endfor
@@ -140,13 +150,13 @@ endfun
 " {{{
 function! s:InfoPath(path)
   let dir = a:path
-  while strlen(dir)
+  while dir =~ '\' . s:slash
     let infopath = glob(dir . s:slash . '*.{info,make,build}')
     if strlen(infopath)
       return infopath
     endif
     " No luck yet, so go up one directory.
-    let dir = substitute(dir, '\' . s:slash . '[^' . s:slash . ']*$', '', '')
+    let dir = substitute(dir, '\' . s:slash . '[^\' . s:slash . ']*$', '', '')
   endwhile
   return ''
 endfun
