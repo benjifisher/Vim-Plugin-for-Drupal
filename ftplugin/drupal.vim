@@ -38,7 +38,7 @@ do BufEnter <buffer>
 " TODO:  If we do not know which version of Drupal core, add no tags file or
 " all?
 if strlen(b:Drupal_info.CORE)
-  let &tags .= ',' . expand('<sfile>:p:h:h') . '/drupal' . b:Drupal_info.CORE . '.tags'
+  let &l:tags .= ',' . expand('<sfile>:p:h:h') . '/drupal' . b:Drupal_info.CORE . '.tags'
 endif
 
 if !exists('*s:OpenURL')
