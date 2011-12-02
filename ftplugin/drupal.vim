@@ -29,7 +29,7 @@ augroup Drupal
   autocmd BufEnter <buffer> if strlen(b:Drupal_info.DRUPAL_ROOT) |
 	\ let $DRUPAL_ROOT = b:Drupal_info.DRUPAL_ROOT | endif
 augroup END
-do BufEnter <buffer>
+do Drupal BufEnter <buffer>
 " }}}
 
 " The tags file can be used for PHP omnicompletion even if $DRUPAL_ROOT == ''.
