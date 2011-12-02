@@ -8,6 +8,8 @@
 2. Filetype detection					|drupal-filetypes|
 3. Global settings					|drupal-global|
 4. PHP settings						|drupal-PHP|
+5. Editing .info files					|drupal-info|
+6. Updates and support					|drupal-update|
 
 The functionality mentioned here is provided by several files.  See the
 installation section.
@@ -86,7 +88,28 @@ You can define the |maplocalleader| variable to be something other than the
 default if you do not want these maps to start with a backslash.
 
 ==============================================================================
-5. Updates and support			*drupal-update* *drupal-support*
+5. Editing .info files				*drupal-info* *drupal-drini*
+
+Files with the extension .info, .make, and .build are recognized as "dot info"
+files and given the filetype drini (for DRupal INI).  Keys and values are
+highlighted:  standard keys with the Identifier highlight group and other keys
+with the Keyword group.  Drupal coding standards are observed.  For example,
+the name should start with an uppercase letter and the rest should be
+lowercase; the description should start with an uppercase letter and end with
+a period.  If dependencies include version restrictions, then these are
+highlighted with the |WarningMsg| group.
+
+The 'omnifunc' option is set to use syntax-based completion:  keywords can be
+completed with CTRL-X CTRL-O. See |i_CTRL-X_CTRL-O| and |syntax-omni|.  This
+works best with version 8.0 or later of the script syntaxcomplete.vim.
+Version 7.0 is included with vim 7.3, in the $VIMRUNTIME/autocomplete
+directory, and is available from
+http://www.vim.org/scripts/script.php?script_id=3172 .  As of late 2011, the
+only way to get version 8.0 is to start with 7.0 and apply the patch at
+http://drupal.org/node/1303122#comment-5213300 .
+
+==============================================================================
+6. Updates and support			*drupal-update* *drupal-support*
 
 For the latest version of this project, see http://drupal.org/project/vimrc .
 To file a bug report or feature request, see the corresponding issues queue:

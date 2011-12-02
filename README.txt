@@ -22,8 +22,12 @@ vimfiles directory:
 
         doc/drupal.txt
         ftdetect/drupal.vim
+        ftplugin/drini.vim
         ftplugin/drupal.vim
+        ftplugin/javascript_drupal.vim
+        ftplugin/php_drupal.vim
         plugin/drupal.vim
+        syntax/drini.vim
 
 In order to use the tags defined in the help file, start vim and do
         :helptags ~/.vim/doc
@@ -31,6 +35,17 @@ In order to use the tags defined in the help file, start vim and do
         :help add-local-help
 for details.  After this step, you should be able to read the documentation with
         :help drupal.txt
+
+AUTOCOMPLETION IN .INFO FILES
+
+The drini (DRupal INI) filetype is used for .info and similar files.  The
+syntax/drini.vim included in this project defines keywords that can be
+auto-completed using syntaxcomplete.vim, but this requires version 8.0 of that
+script.  Version 7.0 is included in the vim 7.3 distribution (in the autoload/
+directory) and is also available from
+http://www.vim.org/scripts/script.php?script_id=3172 .  As of late 2011, the
+only way to get version 8.0 is to patch version 7.0 with the patch at
+http://drupal.org/node/1303122#comment-5213300 .
 
 UPDATES AND SUPPORT
 
