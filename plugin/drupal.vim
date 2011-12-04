@@ -39,7 +39,7 @@ augroup Drupal
   " containing useful information for ftplugins and syntax files.  It will
   " also add drupal as a secondary filetype.  This will load the ftplugins and
   " syntax files drupal.vim after the usual ones.
-  autocmd FileType php,css,javascript,dosini call s:DrupalInit()
+  autocmd FileType php,css,javascript,drini call s:DrupalInit()
 
   " Highlight trailing whitespace.
   autocmd BufWinEnter * call s:ToggleWhitespaceMatch('BufWinEnter')
@@ -94,9 +94,15 @@ function! s:DrupalInit()
   let directory = fnamemodify(path, ':h')
   let info = {'DRUPAL_ROOT': s:DrupalRoot(directory),
 	\ 'INFO_FILE': s:InfoPath(directory)}
-  let info.CORE = s:CoreVersion(info.INFO_FILE)
-  let info.TYPE = s:IniType(info.INFO_FILE)
   let info.OPEN_COMMAND = s:OpenCommand()
+  let info.TYPE = s:IniType(info.INFO_FILE)
+  let info.CORE = s:CoreVersion(info.INFO_FILE)
+  if info.CORE == '' && info.DRUPAL_ROOT != ''
+    let INFO_FILE = info.DRUPAL_ROOT . '/modules/system/system.info'
+    if filereadable(INFO_FILE)
+      let info.CORE = s:CoreVersion(INFO_FILE)
+    endif
+  endif
 
   " @var b:Drupal_info
   let b:Drupal_info = info
@@ -122,7 +128,7 @@ function! s:DrupalRoot(path)
   for part in split(matchstr(a:path, '\' . s:slash . '.*'), s:slash)
     let droot .= s:slash . part
     " This would be easier if it did not have to work on Windows.
-    let ls = glob(droot . s:slash . '*')
+    let ls = glob(droot . s:slash . '*') . "\<C-J>"
     let is_drupal_root = 1
     for marker in markers
       if match(ls, '\' . s:slash . marker . "\<C-J>") == -1

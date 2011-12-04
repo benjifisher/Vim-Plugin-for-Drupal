@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:     Configuration File (ini file) for Drupal, Drush
 " Author:       Benji Fisher <http://drupal.org/user/683300>
-" Last Change: Sat Nov 05 10:00 PM 2011 EDT
+" Last Change: Sun Dec 04 10:00 AM 2011 EST
 
 " References:
 " - modules (7.x):  http://drupal.org/node/542202
@@ -65,21 +65,22 @@ endfun
 " Unless there is a more specific match, the entire line will be given Normal
 " highlighting.
 syn match driniNormal     "\S.*"
-syn match driniComment    "^;.*$"
+syn match driniComment    "^\s*\zs;.*$"
 syn match driniOverLength "\%81v.*" containedin=driniComment contained
 
 " Here is the basic pattern.  Note the use of nextgroup and contained.
+" Later patterns and keywords take priority, so start with the generic key.
 " After the =, either Value or "Value" or 'Value'.  Strings may span lines.
-syn keyword  driniKey    nextgroup=driniEquals skipwhite skipempty datestamp project version
-syn match    driniEquals contained skipwhite skipempty nextgroup=@driniValue "="
-syn cluster  driniValue  contains=driniString,driniRHS
-syn region   driniString contained skipwhite nextgroup=driniNormal
-      \ start=/\z(["']\)/ skip=/\\\z1/ end=/\z1/
-syn match    driniRHS    contained /[^\t "';].*/
-
-" After some keywords, need [] or [subkey].
-syn region driniIndex contained oneline skipwhite skipempty
+syn match    driniCustom    nextgroup=driniIndex,driniEquals skipwhite skipempty
+      \ "[^ \t=;\[\]][^=;\[\]]*"
+syn keyword  driniKey       nextgroup=driniEquals skipwhite skipempty datestamp project version
+syn region driniIndex       contained oneline skipwhite skipempty
       \ nextgroup=driniIndex,driniEquals matchgroup=driniBracket start="\[" end="]"
+syn match    driniEquals    contained skipwhite skipempty nextgroup=@driniValue "="
+syn cluster  driniValue     contains=driniString,driniRHS
+syn region   driniString    contained skipwhite nextgroup=driniNormal
+      \ start=/\z(["']\)/ skip=/\\\z1/ end=/\z1/
+syn match    driniRHS       contained /[^\t "';].*/
 
 " These variants on the pattern let us restrict the syntax of the values.
 
@@ -98,7 +99,7 @@ syn keyword  driniKey        nextgroup=driniDescEquals skipwhite skipempty descr
 syn match    driniDescEquals contained skipwhite skipempty
       \ nextgroup=driniDescValue,driniDescString "="
 syn match    driniDescValue  contained "\u.\{,253}\."
-syn match    driniDescLong   contained "\u\_.\{,253}\."
+syn match    driniDescLong   contained nextgroup=driniDescLong skipwhite "\u\_.\{-,253}\."
 syn region   driniDescString contained contains=driniDescLong keepend
       \ skipwhite nextgroup=driniNormal start=/\z(["']\)/ skip=/\\\z1/ end=/\z1/
 
@@ -113,7 +114,7 @@ syn region   driniDepIndex   contained oneline skipwhite skipempty
       \ nextgroup=driniDepIndex,driniDepEquals matchgroup=driniBracket start="\[" end="]"
 syn match    driniDepEquals  contained skipwhite skipempty
       \ nextgroup=driniDepValue,driniDepString "="
-syn match    driniDepValue   contained skipwhite skipempty
+syn match    driniDepValue   contained skipwhite
       \ nextgroup=driniDepVersion,driniNormal "[a-z_.]\+"
 syn region   driniDepVersion contained oneline contains=driniDepVerNo
       \ skipwhite nextgroup=driniNormal matchgroup=driniDepParen start="(" end=")"
@@ -165,8 +166,9 @@ highlight default link  driniNormal     Normal
 
 highlight default link  driniTheme      driniKey
 highlight default link  driniKey        Keyword
+highlight default link  driniCustom     Identifier
 
-highlight default link  driniBracket    Operator
+highlight default link  driniBracket    Delimeter
 highlight default link  driniDepIndex   driniIndex
 highlight default link  driniIndex      String
 highlight default link  driniCoreEquals driniEquals
@@ -181,7 +183,7 @@ highlight default link  driniDescValue  driniRHS
 highlight default link  driniNameValue  driniRHS
 highlight default link  driniDepVersion Normal
 highlight default link  driniDepVerNo   WarningMsg
-highlight default link  driniDepParen   Operator
+highlight default link  driniDepParen   Delimeter
 highlight default link  driniRHS        String
 highlight default link  driniCoreString driniString
 highlight default link  driniDepString  Normal

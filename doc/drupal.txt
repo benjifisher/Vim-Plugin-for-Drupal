@@ -6,8 +6,12 @@
 
 1. Installation						|drupal-installation|
 2. Filetype detection					|drupal-filetypes|
-3. Global settings					|drupal-global|
-4. PHP settings						|drupal-PHP|
+3. Drupal plugin					|drupal-plugin|
+4. Drupal filetype plugin				|drupal-ftplugin|
+5. Editing .info files					|drupal-info|
+6. Tag searches for Drupal core				|drupal-tags|
+7. Drupal/PHP omni-completion				|ft-drupal-omni|
+8. Updates and support					|drupal-update|
 
 The functionality mentioned here is provided by several files.  See the
 installation section.
@@ -16,11 +20,10 @@ installation section.
 1. Installation						*drupal-installation*
 
 Copy the files, other than README.txt, into your |vimfiles| directory.  If you
-have downloaded these files as ultimate_vimrc.tgz and your vimfiles directory
+have downloaded these files as vimrc.tar.gz and your vimfiles directory
 is ~/.vim, then this should work on UNIX-like systems: >
 	$ cd ~/.vim
-	$ tar tzf path/to/ultimate_vimrc.tgz
-	$ tar xzf path/to/ultimate_vimrc.tgz \
+	$ tar xzf path/to/vimrc.tar.gz \
 		--strip-components 1 --exclude=README.txt
 Note:  if there are filename conflicts, then tar will silently remove the
 existing files.
@@ -28,14 +31,48 @@ existing files.
 When you are done, you should have the following directory structure inside
 your |vimfiles| directory: >
 	doc/drupal.txt
+	drupal6.tags
+	drupal7.tags
 	ftdetect/drupal.vim
-	ftplugin/php_drupal.vim
+	ftplugin/drini.vim
+	ftplugin/drupal.vim
 	plugin/drupal.vim
+	syntax/drini.vim
+	syntax/drupal.vim
 
 In order to use the tags defined in this help file, start vim and >
 	:helptags ~/.vim/doc
 (assuming that this file is installed as ~/.vim/doc/drupal.txt).  See
 |add-local-help| for details.
+
+INSTALLATION WITH PATHOGEN
+
+If you use http://www.vim.org/scripts/script.php?script_id=2332 (pathogen) then
+you can install this project anywhere you like.  One suggestion is to rename
+the directory from vimrc/ to drupal/ and then place it in your bundle/
+directory.  Explicitly, the documentation will be >
+        ~/.vim/bundle/drupal/doc/drupal.txt (Linux, Mac, etc.)
+        ~\vimfiles\bundle\drupal\doc\drupal.txt (Windows)
+Another suggestion is to keep this project with your other Drupal files.  For
+example, if you put this project under ~/drupalstuff/bundle/, so that the
+documentation is ~/drupalstuff/bundle/vimrc/doc/drupal.txt, then add >
+        :call pathogen#infect(~/drupalstuff/bundle)
+to your vimrc file.  (The Windows variant is left as an exercise.)
+
+In either case, you can use the command >
+        :Helptags
+instead of |:helptags|, and let pathogen figure out the path for you.
+
+AUTOCOMPLETION IN .INFO FILES
+
+The drini (DRupal INI) filetype is used for .info and similar files.  The
+syntax/drini.vim included in this project defines keywords that can be
+auto-completed using syntaxcomplete.vim, but this requires version 8.0 of that
+script.  Version 7.0 is included in the vim 7.3 distribution (in the autoload/
+directory) and is also available from
+http://www.vim.org/scripts/script.php?script_id=3172 .  As of late 2011, the
+only way to get version 8.0 is to patch version 7.0 with the patch at
+http://drupal.org/node/1303122#comment-5213300 .
 
 TODO:  There should be a way to install with drush.
 
@@ -45,34 +82,120 @@ TODO:  There should be a way to install with drush.
 The file ftdetect/drupal.vim ensures that files with these extensions are
 recognized as PHP: >
 	.module, .php, .install, .inc, .profile, .theme, .engine, .test
-and these are recognized as INI format: >
+and these are recognized as drini (DRupal INI) format: >
 	.info, .make, .build
 This assumes that you have |filetype| detection on.  See also |ftdetect|.
 
 ==============================================================================
-3. Global settings					*drupal-global*
+3. Drupal plugin					*drupal-plugin*
 
+GLOBAL OPTIONS						*drupal-global*
 The file plugin/drupal.vim sets several |options|.  These will apply whether
-or not you are editing Drupal-related files.  In addition, it sets |filetype|
-detection and |ftplugin| support on; sets global variables used by the
-|php-syntax| file; defines several key mappings; and it highlights trailing
-whitespace and PHP comment lines longer than 80 characters.
+or not you are editing Drupal-related files:
+	'backspace'=2
+	'nocompatible'
+	'encoding'=utf-8
+	'fileformats'=unix
+	'formatoptions'=1
+	'history'=300
+	'hlsearch'
+	'incsearch'
+	'linebreak'
+	'number'
+	'pastetoggle'=<F2>
+	'ruler'
+	'scrolloff'=2
+	'showmatch'
+	'showmode'
+	'undodir'=~/.vim_runtime/undodir
+	'undofile'
+	'wildmode'=longest,list
+
+GLOBAL MAPPINGS							*drupal-maps*
+The script defines the following mappings: >
+	:nn [5C <C-W>w
+	:nn [5R <C-W>W
+	:map <S-u> :redo<cr>
+	:map <C-n> :tabn<cr>
+	:map <C-p> :tabp<cr>
+
+DRUPAL MAGIC			*drupal-magic* *DrupalInit* *b:Drupal_info*
+When you edit a Drupal file, the script tries to find the root of your Drupal
+installation and a .info file for your current project.  If it succeeds, then
+it defines the |buffer-variable| b:Drupal_info, a |Dictionary| with the
+following keys:
+	DRUPAL_ROOT:	the path to your Drupal installation
+	INFO_FILE:	the path to your project's .info file
+	OPEN_COMMAND:	a command for opening URL's on your system
+	TYPE:		"module" or "theme", as appropriate for the project
+	CORE:		the Drupal main version number
+Explicitly, b:Drupal_info.OPEN_COMMAND is set to "open" on Mac OS X,
+"cygstart" on Windows/Cygwin, "cmd /c start" on other Windows, and "xdg-open"
+on UNIX-like systems.
+
+The script always defines all these keys.  If it cannot determine a reasonable
+value, it will use an empty string.
+
+The |drupal-ftplugin| file uses b:Drupal_info.DRUPAL_ROOT to define the
+environment variable $DRUPAL_ROOT.  This is done using a |BufEnter|
+autocommand, so the variable will be set correctly even if you switch between
+files related to different versions of Drupal.
+
+MISCELLANEOUS						*drupal-miscellaneous*
+In addition, this script
+	- sets |:filetype| detection and |ftplugin| support on;
+	- sets the global variables php_htmlInStrings and
+	  php_parent_error_open used by the |php-syntax| file;
+	- tells vim to jump to the last position when reopening a file;
+	- and it highlights trailing whitespace as Error in Drupal files.
 
 ==============================================================================
-4. PHP settings						*drupal-PHP*
+4. Drupal filetype plugin			*ft-drupal* *drupal-ftplugin*
 
-The file ftplugin/php_drupal.vim sets the following options when editing PHP
+When editing a Drupal file, "drupal" is added as a secondary 'filetype'.  For
+example, 'filetype' may be set to "php.drupal" when editing a PHP file or to
+"css.drupal" when editing a CSS file.  When this happens, ftplugin/drupal.vim
+is |:source|d.
+
+LOCAL OPTIONS						*ft-drupal-options*
+The ftplugin file sets the following options:
+	'autoindent'
+	'expandtab'
+	'formatoptions'+=croql
+	'formatoptions'-=t
+	'nojoinspaces'
+	'shiftwidth'=2
+	'smartindent'
+	'smarttab'
+	'tabstop'=2
+	'tags'
+	'textwidth'=80
+This helps you to follow Drupal coding standards:  vim will indent with
+spaces, not tabs, and vim will not add a second line when joining a line
+ending in "." to the line below.  Comments (both doc blocks and //-style) will
+automatically break at 80 characters, and you can reformat them with |gq|.
+
+The 'tags' option is modified only if the CORE and DRUPAL_ROOT keys are
+defined in |b:Drupal_info|.  See |drupal-tags| and |ft-drupal-omni|.
+
+							*ft-drupal-syntax*
+The script syntax/drupal.vim also encourages you to follow Drupal coding
+standards by highlighting comments as errors if they are longer than 80
+characters.
+
+PHP SETTINGS						*drupal-PHP*
+The file ftplugin/drupal.vim sets the following options when editing PHP
 files:
-	'ignorecase', 'smartcase', 'smartindent', 'smarttab', 'expandtab',
-	'tabstop'=2, 'shiftwidth'=2, 'autoindent', 'comments', 'textwidth',
-	'formatoptions'
-Comments (both doc blocks and //-style) will automatically break at 80
-characters, and can be reformatted with |gq|.  You can start a doc block with
+	'comments'
+	'ignorecase'
+	'smartcase'
+You can start a doc block with
 "/**<CR>" and the indentation and comment leader will be inserted.  To end the
 block, just type "<CR>/" and the inserted "* " will automatically turn into
 "*/".  To delete the automatically inserted "// ", you can use <C-U>.
 
-It also defines the following mappings:
+LOCAL MAPPINGS						*drupal-local-maps*
+The ftplugin file also defines the following buffer-local mappings:
 
 gl	Custom SVN blame		*drupal-SVN-blame* *drupal-gl*
 					*drupal-API* *drupal-\da*
@@ -80,13 +203,64 @@ gl	Custom SVN blame		*drupal-SVN-blame* *drupal-gl*
 					*drupal-drush-API* *drupal-\dda*
 \dda	Lookup the API docs for a drush function under cursor.
 					*drupal-variable* *drupal-\dv*
-\dv	Get the value of the drupal variable under cursor.
+\dv	Get the value of the drupal variable under cursor.  (Requires drush.)
 
 You can define the |maplocalleader| variable to be something other than the
 default if you do not want these maps to start with a backslash.
 
 ==============================================================================
-5. Updates and support			*drupal-update* *drupal-support*
+5. Editing .info files				*drupal-info* *drupal-drini*
+
+Files with the extension .info, .make, and .build are recognized as "dot info"
+files and given the filetype drini (for DRupal INI).  Keys and values are
+highlighted:  standard keys with the Identifier highlight group and other keys
+with the Keyword group.  Drupal coding standards are observed.  For example,
+the name should start with an uppercase letter and the rest should be
+lowercase; the description should start with an uppercase letter and end with
+a period.  If dependencies include version restrictions, then these are
+highlighted with the |WarningMsg| group.
+
+The 'omnifunc' option is set to use syntax-based completion:  keywords can be
+completed with CTRL-X CTRL-O. See |i_CTRL-X_CTRL-O| and |syntax-omni|.  This
+works best with version 8.0 or later of the script syntaxcomplete.vim.
+Version 7.0 is included with vim 7.3, in the $VIMRUNTIME/autocomplete
+directory, and is available from
+http://www.vim.org/scripts/script.php?script_id=3172 .  As of late 2011, the
+only way to get version 8.0 is to start with 7.0 and apply the patch at
+http://drupal.org/node/1303122#comment-5213300 .
+
+==============================================================================
+6. Tag searches for Drupal core	*drupal6.tags* *drupal7.tags* *drupal-tags*
+
+If the scripts can determine the root of your Drupal installation, then they
+will set the environment variable $DRUPAL_ROOT and add the appropriate tags
+file (currently drupal6.tags or drupal7.tags) to the 'tags' option.  This lets
+you use vim's |tag-commands| to jump to functions and more that are defined in
+Drupal core.  For example, if the cursor is on the start of the line >
+	drupal_set_message('Hello, world!');
+then you can use <C-W>] to open drupal/includes/bootstrap.inc in a new window
+and jump to the definition of drupal_set_message().  See also section |29.1|
+in the user manual and |window-tag|.
+
+==============================================================================
+7. Drupal/PHP omni-completion				*ft-drupal-omni*
+
+The default |ftplugin| for PHP sets the 'omnifunc' option to use the PHP
+omni-completion script included in the standard vim distribution.  This script
+can use tags files to offer completions.  It always completes standard PHP
+functions.  If the scripts in this project can determine the root of your
+Drupal installation, then Drupal core functions and more can be completed.  If
+you provide tags files for your own projects, or contributed modules and
+themes, then their functions will also be completed.
+
+To trigger omnicompletion, type <C-X><C-O> in Insert mode.  For example, you
+can type >
+	drupal_se<C-X><C-O>
+to find 15 possible completions, including drupal_send_headers() and
+drupal_set_message().  See |compl-omni|.
+
+==============================================================================
+8. Updates and support			*drupal-update* *drupal-support*
 
 For the latest version of this project, see http://drupal.org/project/vimrc .
 To file a bug report or feature request, see the corresponding issues queue:

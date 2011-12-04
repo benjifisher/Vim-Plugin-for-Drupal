@@ -11,19 +11,27 @@ default.  From within vim, use
 
 :help vimfiles
 
-for details.  If you have downloaded these files as ultimate_vimrc.tgz and your
+for details.  If you have downloaded these files as vimrc.tar.gz and your
 vimfiles directory is ~/.vim, then this should work on UNIX-like systems:
 
 $ cd ~/.vim
-$ tar xzf path/to/ultimate_vimrc.tgz --strip-components 1 --exclude=README.txt
+$ tar xzf path/to/vimrc.tar.gz --strip-components 1 --exclude=README.txt
+
+Note:  if there are filename conflicts, then tar will silently remove the
+existing files.
 
 When you are done, you should have the following directory structure inside your
 vimfiles directory:
 
         doc/drupal.txt
+        drupal6.tags
+        drupal7.tags
         ftdetect/drupal.vim
+        ftplugin/drini.vim
         ftplugin/drupal.vim
         plugin/drupal.vim
+        syntax/drini.vim
+        syntax/drupal.vim
 
 In order to use the tags defined in the help file, start vim and do
         :helptags ~/.vim/doc
@@ -31,6 +39,39 @@ In order to use the tags defined in the help file, start vim and do
         :help add-local-help
 for details.  After this step, you should be able to read the documentation with
         :help drupal.txt
+
+INSTALLATION WITH PATHOGEN
+
+If you use http://www.vim.org/scripts/script.php?script_id=2332 (pathogen) then
+you can install this project anywhere you like.  One suggestion is to rename
+the directory from vimrc/ to drupal/ and then place it in your bundle/
+directory.  Explicitly, the documentation will be
+
+        ~/.vim/bundle/drupal/doc/drupal.txt (Linux, Mac, etc.)
+        ~\vimfiles\bundle\drupal\doc\drupal.txt (Windows)
+
+Another suggestion is to keep this project with your other Drupal files.  For
+example, if you put this project under ~/drupalstuff/bundle/, so that the
+documentation is ~/drupalstuff/bundle/vimrc/doc/drupal.txt, then add
+
+        :call pathogen#infect(~/drupalstuff/bundle)
+
+to your vimrc file.  (The Windows variant is left as an exercise.)
+
+In either case, you can use the command
+        :Helptags
+instead of :helptags, and let pathogen figure out the path for you.
+
+AUTOCOMPLETION IN .INFO FILES
+
+The drini (DRupal INI) filetype is used for .info and similar files.  The
+syntax/drini.vim included in this project defines keywords that can be
+auto-completed using syntaxcomplete.vim, but this requires version 8.0 of that
+script.  Version 7.0 is included in the vim 7.3 distribution (in the autoload/
+directory) and is also available from
+http://www.vim.org/scripts/script.php?script_id=3172 .  As of late 2011, the
+only way to get version 8.0 is to patch version 7.0 with the patch at
+http://drupal.org/node/1303122#comment-5213300 .
 
 UPDATES AND SUPPORT
 
