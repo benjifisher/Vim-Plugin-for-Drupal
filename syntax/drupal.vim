@@ -10,4 +10,11 @@ let s:syntax = substitute(&syntax, '\.drupal\>', '', 'g')
 execute 'syn cluster drupalComment contains=' .
       \ substitute(s:syntax, '\.\|$', 'Comment.*,', 'g')
 
+" Add highlighting for doc blocks in PHP files.
+if &syntax =~ '\<php\>'
+  runtime syntax/doxygen.vim
+  syn cluster drupalComment add=doxygen.*
+  syn sync fromstart
+endif
+
 highlight default link drupalOverLength Error
