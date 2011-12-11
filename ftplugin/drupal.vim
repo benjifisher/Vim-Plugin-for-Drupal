@@ -21,16 +21,41 @@ setl formatoptions+=croql
 " Custom SVN blame
 vmap <buffer> gl :<C-U>!svn blame <C-R>=expand("%:P") <CR> \| sed -n <C-R>=line("'<") <CR>,<C-R>=line("'>") <CR>p <CR>
 
-" {{{ @var $DRUPAL_ROOT
-" plugin/drupal.vim defines several useful strings in b:Drupal_info.
-" There is no such thing as buffer-local environment variables, so call this
-" each time you enter a Drupal buffer.
 augroup Drupal
-  autocmd BufEnter <buffer> if strlen(b:Drupal_info.DRUPAL_ROOT) |
-	\ let $DRUPAL_ROOT = b:Drupal_info.DRUPAL_ROOT | endif
+  autocmd BufEnter <buffer> call s:BufEnter()
 augroup END
 do Drupal BufEnter <buffer>
-" }}}
+
+" {{{ @function s:BufEnter()
+" There are some things that we *wish* were local to the buffer.  We stuff
+" them into this function and call them from the autocommand above.
+" - @var $DRUPAL_ROOT
+"   Set this environment variable from b:Drupal_info.DRUPAL_ROOT.
+" - SnipMate settings
+let s:snip_path = expand('<sfile>:p:h:h') . '/snipmate/drupal'
+function! s:BufEnter()
+  if strlen(b:Drupal_info.DRUPAL_ROOT)
+    let $DRUPAL_ROOT = b:Drupal_info.DRUPAL_ROOT
+  endif
+  if exists('*ExtractSnips')
+    call ResetSnippets('drupal')
+    " Load the version-independent snippets.
+    let snip_path = s:snip_path . '/'
+    for ft in split(&ft, '\.')
+      call ExtractSnips(snip_path . ft, 'drupal')
+      call ExtractSnipsFile(snip_path . ft . '.snippets', 'drupal')
+    endfor
+    " If we know the version of Drupal, add the coresponding snippets.
+    if strlen(b:Drupal_info.CORE)
+      let snip_path = s:snip_path . b:Drupal_info.CORE . '/'
+      for ft in split(&ft, '\.')
+	call ExtractSnips(snip_path . ft, 'drupal')
+	call ExtractSnipsFile(snip_path . ft . '.snippets', 'drupal')
+      endfor
+    endif " strlen(b:Drupal_info.CORE)
+  endif " exists('*ExtractSnips')
+endfun
+" }}} s:BufEnter()
 
 " The tags file can be used for PHP omnicompletion even if $DRUPAL_ROOT == ''.
 " If $DRUPAL_ROOT is set correctly, then the tags file can be used for tag
@@ -74,7 +99,7 @@ endif
 " Get the value of the drupal variable under cursor.
 nnoremap <buffer> <LocalLeader>dv :execute "!drush vget ".shellescape(expand("<cword>"), 1)<CR>
 
-" PHP specific settings.
+" {{{ PHP specific settings.
 " In ftdetect/drupal.vim we set ft=php.drupal.  This means that the settings
 " here will come after those set by the PHP ftplugins.  In particular, we can
 " override the 'comments' setting.
@@ -82,7 +107,8 @@ nnoremap <buffer> <LocalLeader>dv :execute "!drush vget ".shellescape(expand("<c
 if &ft =~ '\<php\>'
   setl ignorecase              "Ignore case in search
   setl smartcase               "Only ignore case when all letters are lowercase
-  setl comments=sr:/**,m:*\ ,ex:*/,://
   "  Format comment blocks.  Just type / on a new line to close.
   "  Recognize // (but not #) style comments.
+  setl comments=sr:/**,m:*\ ,ex:*/,://
 endif
+" }}} PHP specific settings.
