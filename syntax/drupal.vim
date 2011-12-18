@@ -13,6 +13,7 @@ execute 'syn cluster drupalComment contains=' .
 " Add highlighting for doc blocks in PHP files.
 if &syntax =~ '\<php\>'
   highlight default link doxygenBrief ToDo
+  highlight default link doxygenSpecialTypeOnelineDesc ToDo
   highlight default link doxygenBody  Normal
   highlight default link doxygenCodeRegion Statement
   highlight default link doxygenParamName Type
