@@ -1,0 +1,430 @@
+snippet hook_block
+	
+	/**
+	 * Implementation of hook_block()
+	 */
+	function `Filename()`_block($op = 'list', $delta = 0, $edit = array()) {
+		switch ($op) {
+			case 'list':
+				${1}
+				break;
+			case 'configure':
+				break;
+			case 'save':
+				break;
+			case 'view':
+				break;
+		}
+	}
+	
+
+snippet hook_comment
+	
+	/**
+	 * Implementation of hook_comment()
+	 */
+	function `Filename()`_comment(&$a1, $op) {
+		switch ($op) {
+			case "insert":
+				${1:// Your code here}
+				break;
+			case "update":
+				break;
+			case "view":
+				break;
+			case "validate":
+				break;
+			case "publish":
+				break;
+			case "unpublish":
+				break;
+			case "delete":
+				break;
+		}
+	}
+	
+
+snippet hook_cron
+	
+	/**
+	 * Implementation of hook_cron()
+	 */
+	function `Filename()`_cron() {
+		${1:// Your code here.}
+	}
+	
+
+snippet hook_form_alter
+	
+	/**
+	 * Implementation of hook_form_alter()
+	 */
+	function `Filename()`_form_alter(&$form, $form_state, $form_id) {
+		switch ($form_id) {
+			case '${1:/* your form */}':
+			  ${2:// your code.}
+		}
+	}
+	
+
+snippet hook_help
+	
+	/**
+	 * Implementation of hook_help
+	 */
+	function `Filename()`_help($path, $arg) {
+		switch ($path) {
+			case '${1:/* path */}':
+				// Enter your help text below
+				return t('${2:/* text */}');
+		}
+	}
+	
+
+snippet hook_init
+	/**
+	 * Implementation of hook_init().
+	 */
+	function `Filename()`_init() {
+		${1:/* your code here */}
+	}
+
+snippet hook_mail_alter
+	
+	/**
+	 * Implementation of hook_mail_alter()
+	 */
+	function `Filename()`_mail_alter(&$message) {
+		${1:// Your code here.}
+	}
+	
+
+snippet hook_menu
+	/**
+	 * Implementation of hook_menu()
+	 */
+	function `Filename()`_menu() {
+		$${1:items} = array();
+		
+		// Put your menu items here.
+		$$1['${2:path}'] = array(
+			'title' => '${3:title}', 
+			'page callback' => '${4:page_callback}', 
+			'access arguments' => array('${5:permission}'), 
+			'type' => ${6:MENU_SUGGESTED_ITEM},
+		);
+		
+		return $$1;
+	}
+	
+
+snippet hook_menu_alter
+	
+	/**
+	 * Implementation of hook_menu_alter().
+	 */
+	function `Filename()`_menu_alter(&$${1:items}) {
+		$$1['${2:/* your code here */}']
+	}
+	
+
+snippet hook_node_info
+	
+	/**
+	 * Implementation of hook_node_info().
+	 */
+	function `Filename()`_node_info() {
+		return array(
+			'${1:/* machine-readable name */}' => array(
+				'name' => t('${2:/* human-readable name */}'),
+				'module' => '`Filename()`',
+				'description' => t('${3:/* description */}'),
+			),
+		);
+	}
+	
+	
+
+snippet hook_node_operations
+	
+	/**
+	 * Implementation of hook_node_operations()
+	 */
+	function `Filename()`_node_operations() {
+		$operations = array(
+		  '${1:/* operation */}' => array(
+		    'label' => t('${2:/* label */}'),
+		    'callback' => '${3:/* callback */}',
+		  ),
+		);
+		return $operations;
+	}
+	
+	/**
+	 * Callback function
+	 */
+	function $3 {
+		${4:// Your code here.}
+	}
+	
+
+snippet hook_node_type
+	
+	/**
+	 * Implementation of hook_node_type()
+	 */
+	function `Filename()`_node_type($op, $info) {
+		switch ($op) {
+			case "delete":
+				${1:// Your code here.}
+				break;
+			case "insert":
+				break;
+			case "update":
+				break;
+		}
+	}
+	
+
+snippet hook_nodeapi
+	
+	/**
+	 * Implementation of hook_nodeapi()
+	 */
+	function `Filename()`_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+		switch ($op) {
+			case "alter":
+				${1:// Your code here.}
+				break;
+			case "delete":
+				break;
+			case "delete revision":
+				break;
+			case "insert":
+				break;
+			case "load":
+				break;
+			case "prepare":
+				break;
+			case "prepare translation":
+				break;
+			case "print":
+				break;
+			case "rss item":
+				break;
+			case "search result":
+				break;
+			case "presave":
+				break;
+			case "update":
+				break;
+			case "update index":
+				break;
+			case "validate":
+				break;
+			case "view":
+				break;
+		}
+	}
+	
+
+snippet hook_perm
+	
+	/**
+	 * Implementation of hook_perm()
+	 */
+	function `Filename()`_perm() {
+		return array('${1:/* permission */}');
+	}
+	
+
+snippet hook_requirements
+	/*
+	 * Implementation of hook_requirements()
+	 * @param string $phase
+	 *  The phase in which hook_requirements is run:
+	 *    'install': the module is being installed.
+	 *    'runtime': the runtime requirements are being checked and shown on the status report page.
+	 * @return
+	 *   A keyed array of requirements. Each requirement is itself an array with the following items:
+	 *     'title': the name of the requirement.
+	 *     'value': the current value (e.g. version, time, level, ...).
+	 *       During install phase, this should only be used for version numbers, do not set it if not applicable.
+	 *     'description': description of the requirement/status.
+	 *     'severity': the requirement's result/severity level, one of:
+	 *       REQUIREMENT_INFO: For info only.
+	 *       REQUIREMENT_OK: The requirement is satisfied.
+	 *       REQUIREMENT_WARNING: The requirement failed with a warning.
+	 *       REQUIREMENT_ERROR: The requirement failed with an error.
+	 *
+	 */
+	function `Filename()`_requirements($phase) {
+	  $requirements = array();
+	
+	  ${1:// Your code here.}
+	
+	  return $requirements;
+	}
+	
+
+snippet hook_schema
+	
+	/**
+	 * Implementation of hook_schema()
+	 */
+	function `Filename()`_schema() {
+		$schema['${1:table}'] = array(
+			'description' => '${2}',
+			'fields' => array(
+				'${3:column}' => array(
+					'description' => '${4}',
+					'type' => '${5}',
+					'unsigned' => ${6},
+					'not null' => ${7},
+				),
+			),
+			'indexes' => array(
+				${8}
+			),
+			'unique keys' => array(
+				${9}
+			),
+			'primary key' => array(${10}),
+		);
+		return $schema
+	}
+	
+
+snippet hook_taxonomy
+	
+	/**
+	 * Implementation of hook_taxonomy()
+	 */
+	function `Filename()`_taxonomy($op, $type, $array = NULL) {
+		switch ($op) {
+			case "delete":
+				${1:// Your code here.}
+				break;
+			case "insert":
+				break;
+			case "update":
+				break;
+		}
+	}
+	
+
+snippet hook_theme
+	
+	/**
+	 * Implementation of hook_theme()
+	 */
+	function `Filename()`_theme($existing, $type, $theme, $path) {
+		return array(
+			'${1:theme_function}' => array(
+				'arguments' => array(${2:/* Theme function arguments */}),
+				${3:/* See for options */}
+			),
+		);
+	}
+	
+
+snippet hook_update_N
+	/*
+	 * Implementation of hook_update_N().
+	 * @see http://api.drupal.org/api/drupal/developer--hooks--install.php/function/hook_update_N/6
+	 * @return array $ret
+	 *  An array with the results of the calls to update_sql().
+	 */
+	function `Filename()`_update_N(&$sandbox) {
+	  $ret = array();
+	
+	  ${1:// Your code here.}
+	
+	  return $ret;
+	}
+
+snippet hook_user
+	
+	/**
+	 * Implementation of hook_user()
+	 */
+	function `Filename()`_user($op, &$edit, &$account, $category = NULL) {
+		switch ($op) {
+			case "after_update":
+				${1:// Your code here.}
+				break;
+			case "categories":
+				break;
+			case "delete":
+				break;
+			case "form":
+				break;
+			case "insert":
+				break;
+			case "load":
+				break;
+			case "login":
+				break;
+			case "logout":
+				break;
+			case "register":
+				break;
+			case "submit":
+				break;
+			case "update":
+				break;
+			case "validate":
+				break;
+			case "view":
+				break;
+		}
+	}
+	
+
+snippet hook_user_operations
+	
+	/**
+	 * Implementation of hook_user_operations()
+	 */
+	
+	function `Filename()`_user_operations() {
+		$operations = array(
+			'${1:/* operation */}' => array(
+				'label' => t('${2:/* label */}'),
+				'callback' => '${3:/* callback */}',
+			),
+		);
+		return $operations;
+	}
+	
+	/**
+	 * Callback function
+	 */
+	function $3 {
+		${4:// Your code here.}
+	}
+	
+
+snippet hook_views_api
+	
+	/**
+	 * Implementation of hook_views_api()
+	 */
+	function `Filename()`_views_api() {
+		return array(
+			'api' => 2,
+			'path' => drupal_get_path('module', '`Filename()`') . '/views',
+		);
+	}
+	
+
+snippet hook_views_query_alter
+	
+	/**
+	 * Implementation of hook_views_query_alter()
+	 */
+	function `Filename()`_views_query_alter(&$view, &$query) {
+		${2:// Your code here.}
+	}
+	
+
