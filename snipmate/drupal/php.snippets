@@ -1,3 +1,5 @@
+## Forms API
+
 snippet checkbox
 	$form['${1:/* form element */}'] = array(
 		'#type' => 'checkbox', 
@@ -15,56 +17,11 @@ snippet checkboxes
 		);
 	);
 
-snippet db_fetch_array
-	while ($${1:row} = db_fetch_array($result)) {
-		${2:// Your code here}
-	}
-
-snippet db_fetch_object
-	while ($${1:row} = db_fetch_object($result)) {
-		${2:// Your code here}
-	}
-
-snippet db_query
-	$result = db_query('${1:/* Query */}', ${2:/* Arguments */});
-
-snippet db_rewrite_sql
-	$result = db_query(db_rewrite_sql('${1:/* Query */}'), ${2:/* Arguments */});
-
-snippet drupal_add_css
-	drupal_add_css(${1:/* path */}, '${2:/* Type (optional) 'module' or 'theme' */}', '${3:/* Media (optional) e.g. 'all', 'print', or 'screen' */}', ${4:/* preprocess TRUE of FALSE */});
-
-snippet drupal_add_js
-	drupal_add_js(${1:/* Data */}, '${2:/* Type 'core', 'module', 'theme', 'inline' and 'setting' */}', '${3:/* Scope: header or footer */}', ${4:/* Defer TRUE of FALSE */}, ${5:/* Cache TRUE or FALSE*/}, ${6: /* Preprocess TRUE or FALSE */});
-
-snippet drupal_get_form
-	drupal_get_form('${1:/* Form ID */}', $${2:argument});
-
-snippet drupal_get_path
-	drupal_get_path('${1:/* Type: module, theme or theme_engine */}', '${2:/* Name */}');
-
-snippet drupal_get_path_alias
-	drupal_get_path_alias('node/${1:nid}', ${2:language (optional)});
-
-snippet drupal_goto
-	drupal_goto('${1:path}', '${2:query}', '${3:anchor}', '${4:http_response_code}');
-
-snippet dsm
-	drupal_set_message('${1:message}.', '${2:status, warning, or error}', ${3:repeat (default:TRUE)});
-
 snippet file
 	$form['${1:/* form element */}'] = array(
 		'#type' => 'file', 
 		'#title' => t('${2:/* title */}'), 
 		'#description' => t('${3:/* description */}'),
-	);
-
-snippet l
-	l(${1:/* text */}, ${2:/* link */})
-
-snippet markup
-	$form['${1:/* form element */}'] = array(
-		'#value' => '${2:/* markup */}',
 	);
 
 snippet select
@@ -83,9 +40,6 @@ snippet submit
 		'#value' => t('${2:/* value */}'),
 	);
 
-snippet t
-	t('${1:/* Your text */}', array(${1:/* arguments */}))
-
 snippet textarea
 	$form['${1:/* form element */}'] = array(
 		'#type' => 'textarea', 
@@ -99,6 +53,190 @@ snippet textfield
 		'#title' => t('${2:/* title */}'), 
 		'#size' => ${3:/* default:60 */},
 	);
+
+## drupal_ functions
+
+snippet drupal_get_form
+	drupal_get_form('${1:/* Form ID */}', $${2:argument});
+
+snippet drupal_get_path
+	drupal_get_path('${1:/* Type: module, theme or theme_engine */}', '${2:/* Name */}');
+
+snippet drupal_get_path_alias
+	drupal_get_path_alias('node/${1:nid}', ${2:language (optional)});
+
+# Shortcut for drupal_set_message
+snippet dsm
+	drupal_set_message('${1:message}.', '${2:status, warning, or error}', ${3:repeat (default:TRUE)});
+
+## Hooks
+
+snippet hook_cron
+	
+	/**
+	 * Implementation of hook_cron()
+	 */
+	function `Filename()`_cron() {
+		${1:// Your code here.}
+	}
+	
+
+snippet hook_form_alter
+	
+	/**
+	 * Implementation of hook_form_alter()
+	 */
+	function `Filename()`_form_alter(&$form, $form_state, $form_id) {
+		switch ($form_id) {
+			case '${1:/* your form */}':
+			  ${2:// your code.}
+		}
+	}
+	
+
+snippet hook_help
+	
+	/**
+	 * Implementation of hook_help
+	 */
+	function `Filename()`_help($path, $arg) {
+		switch ($path) {
+			case '${1:/* path */}':
+				// Enter your help text below
+				return t('${2:/* text */}');
+		}
+	}
+	
+
+snippet hook_init
+	/**
+	 * Implementation of hook_init().
+	 */
+	function `Filename()`_init() {
+		${1:/* your code here */}
+	}
+
+snippet hook_mail_alter
+	
+	/**
+	 * Implementation of hook_mail_alter()
+	 */
+	function `Filename()`_mail_alter(&$message) {
+		${1:// Your code here.}
+	}
+	
+
+snippet hook_menu
+	/**
+	 * Implementation of hook_menu()
+	 */
+	function `Filename()`_menu() {
+		$${1:items} = array();
+		
+		// Put your menu items here.
+		$$1['${2:path}'] = array(
+			'title' => '${3:title}', 
+			'page callback' => '${4:page_callback}', 
+			'access arguments' => array('${5:permission}'), 
+			'type' => ${6:MENU_SUGGESTED_ITEM},
+		);
+		
+		return $$1;
+	}
+	
+
+snippet hook_menu_alter
+	
+	/**
+	 * Implementation of hook_menu_alter().
+	 */
+	function `Filename()`_menu_alter(&$${1:items}) {
+		$$1['${2:/* your code here */}']
+	}
+	
+
+snippet hook_node_info
+	
+	/**
+	 * Implementation of hook_node_info().
+	 */
+	function `Filename()`_node_info() {
+		return array(
+			'${1:/* machine-readable name */}' => array(
+				'name' => t('${2:/* human-readable name */}'),
+				'module' => '`Filename()`',
+				'description' => t('${3:/* description */}'),
+			),
+		);
+	}
+	
+
+snippet hook_node_operations
+	
+	/**
+	 * Implementation of hook_node_operations()
+	 */
+	function `Filename()`_node_operations() {
+		$operations = array(
+		  '${1:/* operation */}' => array(
+		    'label' => t('${2:/* label */}'),
+		    'callback' => '${3:/* callback */}',
+		  ),
+		);
+		return $operations;
+	}
+	
+	/**
+	 * Callback function
+	 */
+	function $3 {
+		${4:// Your code here.}
+	}
+	
+
+snippet hook_theme
+	
+	/**
+	 * Implementation of hook_theme()
+	 */
+	function `Filename()`_theme($existing, $type, $theme, $path) {
+		return array(
+			'${1:theme_function}' => array(
+				'arguments' => array(${2:/* Theme function arguments */}),
+				${3:/* See for options */}
+			),
+		);
+	}
+	
+
+snippet hook_user_operations
+	
+	/**
+	 * Implementation of hook_user_operations()
+	 */
+	
+	function `Filename()`_user_operations() {
+		$operations = array(
+			'${1:/* operation */}' => array(
+				'label' => t('${2:/* label */}'),
+				'callback' => '${3:/* callback */}',
+			),
+		);
+		return $operations;
+	}
+	
+	/**
+	 * Callback function
+	 */
+	function $3 {
+		${4:// Your code here.}
+	}
+	
+
+## Everything else
+
+snippet l
+	l(${1:/* text */}, ${2:/* link */})
 
 snippet url
 	url('${1:path}', array('query' => '${2:query}', 'absolute' => ${3:false}))
