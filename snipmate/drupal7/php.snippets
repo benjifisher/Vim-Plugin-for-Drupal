@@ -1,0 +1,225 @@
+## Forms API
+
+snippet markup
+	$form['${1:/* form element */}'] = array(
+		'#markup' => '<${2:div}>' . '${3:/* markup */}' . '</$2>',
+	);
+
+## Database functions
+
+snippet db_query
+	$result = db_query('${1:/* Query */}', ${2:/* Arguments */}, ${3:/* Options */});
+
+## drupal_ functions
+
+snippet drupal_add_css
+	drupal_add_css(${1:/* Data */}, '${2:/* Options */}');
+
+snippet drupal_add_js
+	drupal_add_js(${1:/* Data */}, '${2:/* Options */}');
+
+snippet drupal_goto
+	drupal_goto('${1:path}', '${2:options}', '${3:http_response_code}');
+
+## Hooks
+
+snippet hook_block
+	
+	/**
+	 * Implementation of hook_block_info()
+	 */
+	function `Filename()`_block_info() {
+	  ${1:// Your code here}
+	}
+	
+	/**
+	 * Implementation of hook_block_save()
+	 */
+	function `Filename()`_block_save() {
+	}
+	
+	/**
+	 * Implementation of hook_block_view()
+	 */
+	function `Filename()`_block_view() {
+	}
+	
+	/**
+	 * Implementation of hook_block_configure()
+	 */
+	function `Filename()`_block_configure() {
+	}
+	
+	/**
+	 * Implementation of hook_block_list_alter()
+	 */
+	function `Filename()`_block_list_alter() {
+	}
+	
+	/**
+	 * Implementation of hook_block_info_alter()
+	 */
+	function `Filename()`_block_info_alter() {
+	}
+	
+	/**
+	 * Implementation of hook_block_view_alter()
+	 */
+	function `Filename()`_block_view_alter() {
+	}
+	
+	/**
+	 * Implementation of hook_block_view_MODULE_DELTA_alter()
+	 */
+	function `Filename()`_block_view_MODULE_DELTA_alter() {
+	}
+	
+
+snippet hook_comment
+	
+	/**
+	 * Implementation of hook_comment_view()
+	 */
+	function `Filename()`_comment_view($comment, $view_mode, $langcode) {
+	  ${1:// Your code here}
+	}
+	
+	/**
+	 * Implementation of hook_comment_load()
+	 */
+	function `Filename()`_comment_load($comments) {
+	}
+	
+	/**
+	 * Implementation of hook_comment_update()
+	 */
+	function `Filename()`_comment_update($comment) {
+	}
+	
+	/**
+	 * Implementation of hook_comment_insert()
+	 */
+	function `Filename()`_comment_insert($comment) {
+	}
+	
+	/**
+	 * Implementation of hook_comment_delete()
+	 */
+	function `Filename()`_comment_delete($comment) {
+	}
+	
+	/**
+	 * Implementation of hook_comment_presave()
+	 */
+	function `Filename()`_comment_presave($comment) {
+	}
+	
+	/**
+	 * Implementation of hook_comment_publish()
+	 */
+	function `Filename()`_comment_publish($comment) {
+	}
+	
+	/**
+	 * Implementation of hook_comment_unpublish()
+	 */
+	function `Filename()`_comment_unpublish($comment) {
+	}
+	
+	/**
+	 * Implementation of hook_comment_view_alter()
+	 */
+	function `Filename()`_comment_view_alter(&$build) {
+	}
+	
+
+snippet hook_node_type
+	
+	/**
+	 * Implementation of hook_node_type_delete()
+	 */
+	function `Filename()`_node_type_delete($info) {
+	  ${1:// Your code here}
+	}
+	
+	/**
+	 * Implementation of hook_node_type_insert()
+	 */
+	function `Filename()`_node_type_insert($info) {
+	}
+	
+	/**
+	 * Implementation of hook_node_type_update()
+	 */
+	function `Filename()`_node_type_update($info) {
+	}
+	
+
+snippet hook_permission
+	
+	/**
+	 * Implementation of hook_permission()
+	 */
+	function `Filename()`_permission() {
+		return array('${1:/* permission */}' => array(
+	            'title' => t('${2}'),
+	            'description' => t('${3:/* optional */}'),
+	            'restrict access' => t('${4:/* optional */}'),
+	            'warning' => t('${5:/* optional */}'),
+	          ));
+	}
+	
+
+snippet hook_requirements
+	/*
+	 * Implementation of hook_requirements()
+	 * @param string $phase
+	 *  The phase in which hook_requirements is run:
+	 *    'install': the module is being installed.
+	 *    'update': the module is enabled and update.php is run.
+	 *    'runtime': the runtime requirements are being checked and shown on the
+	 *      status report page.
+	 * @return
+	 *   A keyed array of requirements. Each requirement is itself an array with
+	 *     the following items:
+	 *       'title': the name of the requirement.
+	 *       'value': the current value (e.g. version, time, level, ...).
+	 *         During install phase, this should only be used for version
+	 *         numbers, do not set it if not applicable.
+	 *       'description': description of the requirement/status.
+	 *       'severity': the requirement's result/severity level, one of:
+	 *         REQUIREMENT_INFO: For info only.
+	 *         REQUIREMENT_OK: The requirement is satisfied.
+	 *         REQUIREMENT_WARNING: The requirement failed with a warning.
+	 *         REQUIREMENT_ERROR: The requirement failed with an error.
+	 *
+	 */
+	function `Filename()`_requirements($phase) {
+	  $requirements = array();
+	
+	  ${1:// Your code here.}
+	
+	  return $requirements;
+	}
+	
+
+snippet hook_update_N
+	/*
+	 * Implementation of hook_update_N().
+	 * @see http://api.drupal.org/api/drupal/modules--system--system.api.php/function/hook_update_N/7
+	 * @return array $ret
+	 *  An array with the results of the calls to update_sql().
+	 */
+	function `Filename()`_update_N(&$sandbox) {
+	  $ret = array();
+	
+	  ${1:// Your code here.}
+	
+	  return $ret;
+	}
+
+## Everything else
+
+snippet t
+	t('${1:/* Your text */}', array(${1:/* arguments */}), array(${2:/* options */}))
+
