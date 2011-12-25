@@ -43,10 +43,14 @@ syntax on
 nn [5C <C-W>w
 nn [5R <C-W>W
 
-" Custom key mapping
-map <S-u> :redo<cr>
-map <C-n> :tabn<cr>
-map <C-p> :tabp<cr>
+" Custom key mapping:  use <S-u> instead of U for the Mac.
+call drupal#CreateMaps('', 'Drupal.Redo', '<S-u>', ':redo<CR>')
+call drupal#CreateMaps('', 'Drupal.Next tab', '<C-N>', ':tabn<CR>')
+call drupal#CreateMaps('', 'Drupal.Prev tab', '<C-P>', ':tabp<CR>')
+" map <S-u> :redo<cr>
+" map <C-n> :tabn<cr>
+" map <C-p> :tabp<cr>
+call drupal#CreateMaps('', 'Drupal.-Drupal Custom-', '', ':')
 
 " {{{
 " Everything from here on assumes that autocommands are available.
@@ -273,3 +277,12 @@ function! s:IniType(info_path)
   endif
 endfun
 " }}} }}}
+
+" {{{ @
+function! s:SetDrupalRoot()
+  let dir = input('Drupal root directory: ', b:Drupal_info.DRUPAL_ROOT, 'file')
+  let b:Drupal_info.DRUPAL_ROOT = expand(substitute(dir, '[/\\]$', '', ''))
+endfun
+" }}}
+nmap <Plug>DrupalSetRoot :call <SID>SetDrupalRoot()<CR>
+call drupal#CreateMaps('n', 'Drupal.Configure.Set Drupal root', '', '<Plug>DrupalSetRoot')
