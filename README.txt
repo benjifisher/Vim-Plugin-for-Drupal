@@ -81,7 +81,7 @@ http://drupal.org/project/issues/vimrc?status=All&categories=All
 
 TROUBLESHOOTING
 
-* If :help dies not work:
+* If :help does not work:
 
 If :help does not work in your installation of vim, you can find the official
 vim documentation on-line at http://vimdoc.sourceforge.net/ .  It may be that
