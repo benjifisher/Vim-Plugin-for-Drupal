@@ -18,6 +18,13 @@ setl formatoptions+=croql
 "  +q:  Format comments using q<motion>.
 "  +l:  Do not break a comment line if it is long before you start.
 
+" Syntastic settings, adapted from
+" echodittolabs.org/drupal-coding-standards-vim-code-sniffer-syntastic-regex
+if &ft =~ '\<php\>' && exists('loaded_syntastic_plugin') && executable('phpcs')
+  let g:syntastic_phpcs_conf = ' --standard=DrupalCodingStandard'
+	\ . ' --extensions=php,module,inc,install,test,profile,theme'
+endif
+
 " Custom SVN blame
 vmap <buffer> gl :<C-U>!svn blame <C-R>=expand("%:P") <CR> \| sed -n <C-R>=line("'<") <CR>,<C-R>=line("'>") <CR>p <CR>
 
