@@ -12,6 +12,9 @@ execute 'syn cluster drupalComment contains=' .
 
 " Add highlighting for doc blocks in PHP files.
 if &syntax =~ '\<php\>'
+  syn match doxygenParamName "\$[A-Za-z0-9_:]\+"  contained
+	\ nextgroup=doxygenSpecialMultilineDesc skipwhite
+  highlight default link doxygenBOther SpecialComment
   highlight default link doxygenBrief ToDo
   highlight default link doxygenSpecialTypeOnelineDesc ToDo
   highlight default link doxygenBody  Normal
