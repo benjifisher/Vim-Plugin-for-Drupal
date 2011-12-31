@@ -16,23 +16,30 @@
 " {{{
 function! drupal#CreateMaps(modes, menu, key, target, options)
   let map_command = 'map <silent> ' . a:key . ' ' . a:target
-  let shortcut = get(a:options, 'shortcut', a:key)
+  let shortcut = escape(get(a:options, 'shortcut', a:key), ' ')
   if has_key(a:options, 'root')
     let item = a:options.root . '.' . a:menu
   else
     let item = a:menu
   endif
-  let menu_command = 'menu <silent> '
+  let menu_command = 'menu <silent>'
   if has_key(a:options, 'weight')
     " Prepend one dot for each parent menu.
     let dots = strpart(s:Dots(item), strlen(s:Dots(a:options.weight)))
-    let menu_command .= dots . a:options.weight . ' '
+    let menu_command .= ' ' . dots . a:options.weight
   endif
-  let menu_command .= escape(item, ' ')
+  let menu_command .= ' ' . escape(item, ' ')
   if strlen(shortcut)
     let leader = exists('mapleader') ? mapleader : '\'
     let shortcut = substitute(shortcut, '\c<leader>', escape(leader, '\'), 'g')
-    let menu_command .= '<Tab>' . shortcut
+    if !has('macunix')
+      let menu_command .= '<Tab>' . shortcut
+    else
+      " Menu shortcuts work differently on the Mac, so use escaped spaces.
+      let len = strlen(a:menu . shortcut)
+      let spaces = repeat('\ ', max([1, 20 - len]))
+      let menu_command .= spaces . shortcut
+    endif
   endif
   let menu_command .= ' ' . a:target
   " Execute the commands built above for each requested mode.
@@ -54,7 +61,7 @@ endfunction
 " @return
 "   String:  in the example, '..'.
 " {{{
-function s:Dots(menuPath)
+function! s:Dots(menuPath)
   let dots = substitute(a:menuPath, '\\\\', '', 'g')
   let dots = substitute(dots, '\\\.', '', 'g')
   let dots = substitute(dots, '[^.]', '', 'g')
