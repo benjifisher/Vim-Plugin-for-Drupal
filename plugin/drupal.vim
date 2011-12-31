@@ -15,10 +15,15 @@ syntax on
 nn [5C <C-W>w
 nn [5R <C-W>W
 
-" Custom key mapping
-map <S-u> :redo<cr>
-map <C-n> :tabn<cr>
-map <C-p> :tabp<cr>
+" Custom key mapping:  use <S-u> instead of U for the Mac.
+let s:options = {'root': 'Drupal'}
+call drupal#CreateMaps('', 'Redo', '<S-u>', ':redo<CR>', s:options)
+call drupal#CreateMaps('', 'Next tab', '<C-N>', ':tabn<CR>', s:options)
+call drupal#CreateMaps('', 'Prev tab', '<C-P>', ':tabp<CR>', s:options)
+" map <S-u> :redo<cr>
+" map <C-n> :tabn<cr>
+" map <C-p> :tabp<cr>
+call drupal#CreateMaps('', '-Drupal Custom-', '', ':', s:options)
 
 " {{{
 " Everything from here on assumes that autocommands are available.
@@ -258,3 +263,13 @@ function! s:IniType(info_path)
   endif
 endfun
 " }}} }}}
+
+" {{{ @
+function! s:SetDrupalRoot()
+  let dir = input('Drupal root directory: ', b:Drupal_info.DRUPAL_ROOT, 'file')
+  let b:Drupal_info.DRUPAL_ROOT = expand(substitute(dir, '[/\\]$', '', ''))
+endfun
+" }}}
+nmap <Plug>DrupalSetRoot :call <SID>SetDrupalRoot()<CR>
+let s:options = {'root': 'Drupal.Configure'}
+call drupal#CreateMaps('n', 'Set Drupal root', '', '<Plug>DrupalSetRoot', s:options)
