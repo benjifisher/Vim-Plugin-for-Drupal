@@ -136,6 +136,15 @@ on UNIX-like systems.
 The script always defines all these keys.  If it cannot determine a reasonable
 value, it will use an empty string.
 
+							       *g:Drupal_dirs*
+If you are editing a project that is not inside your Drupal root, then it
+should still be able to determine the version of Drupal core.  In this case,
+define the |Dictionary| g:Drupal_dirs in your vimrc file, with keys the
+versions of Drupal core you use and values your Drupal roots.  For example, >
+	:let g:Drupal_dirs = {6: '/var/www/drupal6.22', 7: '/path/to/D7'}
+Then the script will set b:Drupal_info.DRUPAL_ROOT to the directory
+corresponding to the value of b:Drupal_info.CORE.
+
 The |drupal-ftplugin| file uses b:Drupal_info.DRUPAL_ROOT to define the
 environment variable $DRUPAL_ROOT.  This is done using a |BufEnter|
 autocommand, so the variable will be set correctly even if you switch between
