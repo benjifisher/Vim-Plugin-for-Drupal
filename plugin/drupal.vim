@@ -102,7 +102,7 @@ function! s:DrupalInit()
   let info.OPEN_COMMAND = s:OpenCommand()
   let info.TYPE = s:IniType(info.INFO_FILE)
   let info.CORE = s:CoreVersion(info.INFO_FILE)
-  " If we cannot find a .info file for the project, use one from DRUPAL_ROOT.
+  " If we found only one of CORE and DRUPAL_ROOT, use it to get the other.
   if info.CORE == '' && info.DRUPAL_ROOT != ''
     let INFO_FILE = info.DRUPAL_ROOT . '/modules/system/system.info'
     if filereadable(INFO_FILE)
@@ -113,6 +113,8 @@ function! s:DrupalInit()
 	let info.CORE = s:CoreVersion(INFO_FILE)
       endif
     endif
+  elseif info.DRUPAL_ROOT == '' && info.CORE != ''  && exists('g:Drupal_dirs')
+    let info.DRUPAL_ROOT = get(g:Drupal_dirs, info.CORE, '')
   endif
 
   " @var b:Drupal_info
