@@ -70,7 +70,11 @@ endfun
 " TODO:  If we do not know which version of Drupal core, add no tags file or
 " all?
 if strlen(b:Drupal_info.CORE)
-  let &l:tags .= ',' . expand('<sfile>:p:h:h') . '/drupal' . b:Drupal_info.CORE . '.tags'
+  let s:tags = 'drupal' . b:Drupal_info.CORE . '.tags'
+  " Bail out if the Drupal tags file has already been added.
+  if stridx(&l:tags, s:tags) == -1
+    let &l:tags .= ',' . expand('<sfile>:p:h:h') . '/' . s:tags
+  endif
 endif
 
 if !exists('*s:OpenURL')
