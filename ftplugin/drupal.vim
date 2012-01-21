@@ -19,7 +19,8 @@ setl formatoptions+=croql
 "  +l:  Do not break a comment line if it is long before you start.
 
 " Custom SVN blame
-vmap <buffer> gl :<C-U>!svn blame <C-R>=expand("%:P") <CR> \| sed -n <C-R>=line("'<") <CR>,<C-R>=line("'>") <CR>p <CR>
+let s:options = {'root': 'Drupal', 'special': '<buffer>'}
+call drupal#CreateMaps('v', 'SVN blame', 'gl', ':<C-U>!svn blame <C-R>=expand("%:P") <CR> \| sed -n <C-R>=line("''<") <CR>,<C-R>=line("''>") <CR>p <CR>', s:options)
 
 " {{{ @var $DRUPAL_ROOT
 " plugin/drupal.vim defines several useful strings in b:Drupal_info.
@@ -64,15 +65,24 @@ endfun
 endif " !exists('*s:OpenURL')
 
 if strlen(b:Drupal_info.OPEN_COMMAND)
+  let s:options = {'root': 'Drupal', 'special': '<buffer>'}
+
   " Lookup the API docs for a drupal function under cursor.
-  nnoremap <buffer> <LocalLeader>da :silent call <SID>OpenURL('api.d.o')<CR><C-L>
+  nmap <Plug>DrupalAPI :silent call <SID>OpenURL("api.d.o")<CR><C-L>
+  call drupal#CreateMaps('n', 'Drupal API', '<LocalLeader>da', 
+	\ '<Plug>DrupalAPI', s:options)
 
   " Lookup the API docs for a drush function under cursor.
-  nnoremap <buffer> <LocalLeader>dda :silent call <SID>OpenURL('http://api.drush.ws/api/function/')<CR><C-L>
+  nmap <Plug>DrushAPI :silent call <SID>OpenURL("http://api.drush.ws/api/function/")<CR><C-L>
+  call drupal#CreateMaps('n', 'Drush API', '<LocalLeader>dda',
+	\ '<Plug>DrushAPI', s:options)
 endif
 
 " Get the value of the drupal variable under cursor.
 nnoremap <buffer> <LocalLeader>dv :execute "!drush vget ".shellescape(expand("<cword>"), 1)<CR>
+  call drupal#CreateMaps('n', 'variable_get', '<LocalLeader>dv',
+	\ ':execute "!drush vget ".shellescape(expand("<cword>"), 1)<CR>',
+	\ s:options)
 
 " PHP specific settings.
 " In ftdetect/drupal.vim we set ft=php.drupal.  This means that the settings
