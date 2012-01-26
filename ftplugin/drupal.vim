@@ -26,10 +26,9 @@ vmap <buffer> gl :<C-U>!svn blame <C-R>=expand("%:P") <CR> \| sed -n <C-R>=line(
 " There is no such thing as buffer-local environment variables, so call this
 " each time you enter a Drupal buffer.
 augroup Drupal
-  autocmd BufEnter <buffer> if strlen(b:Drupal_info.DRUPAL_ROOT) |
+  autocmd! BufEnter <buffer> if strlen(b:Drupal_info.DRUPAL_ROOT) |
 	\ let $DRUPAL_ROOT = b:Drupal_info.DRUPAL_ROOT | endif
 augroup END
-do Drupal BufEnter <buffer>
 " }}}
 
 " The tags file can be used for PHP omnicompletion even if $DRUPAL_ROOT == ''.
