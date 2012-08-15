@@ -92,6 +92,13 @@ function s:OpenURL(base)
     else
       execute '!' . open . ' http://api.drupal.org/' . func
     endif
+  elseif a:base == 'drupalcontrib'
+    if strlen(b:Drupal_info.CORE)
+      execute '!' . open . ' http://drupalcontrib.org/api/search/' .
+	    \ b:Drupal_info.CORE . '/' . func
+    else
+      execute '!' . open . ' http://drupalcontrib.org/' . func
+    endif
   else
     execute '!' . open . ' ' . a:base . func
   endif
@@ -106,6 +113,11 @@ if strlen(b:Drupal_info.OPEN_COMMAND)
   nmap <Plug>DrupalAPI :silent call <SID>OpenURL("api.d.o")<CR><C-L>
   call drupal#CreateMaps('n', 'Drupal API', '<LocalLeader>da', 
 	\ '<Plug>DrupalAPI', s:options)
+
+  " Lookup the API docs for a contrib module function under cursor.
+  nmap <Plug>DrupalContribAPI :silent call <SID>OpenURL("drupalcontrib")<CR><C-L>
+  call drupal#CreateMaps('n', 'Drupal Contrib API', '<LocalLeader>dc', 
+	\ '<Plug>DrupalContribAPI', s:options)
 
   " Lookup the API docs for a drush function under cursor.
   nmap <Plug>DrushAPI :silent call <SID>OpenURL("http://api.drush.ws/api/function/")<CR><C-L>

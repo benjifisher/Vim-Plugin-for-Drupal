@@ -209,6 +209,8 @@ The ftplugin file also defines the following buffer-local mappings:
 gl	Custom SVN blame		*drupal-SVN-blame* *drupal-gl*
 					*drupal-API* *drupal-\da*
 \da	Lookup the API docs for a drupal function under cursor.
+					*drupal-contrib* *drupal-\dc*
+\dc	Same as \da but use http://drupalcontrib.org/.
 					*drupal-drush-API* *drupal-\dda*
 \dda	Lookup the API docs for a drush function under cursor.
 					*drupal-variable* *drupal-\dv*
